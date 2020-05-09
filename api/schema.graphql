@@ -1,0 +1,15 @@
+type Query {
+  hello: String
+  test: String
+  products: [Product]
+}
+
+type Mutation {
+  hola(greeting: String): String
+}
+
+type Product {
+  name: String
+  thing: String
+  example: String
+}

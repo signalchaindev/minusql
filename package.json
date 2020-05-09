@@ -1,0 +1,31 @@
+{
+  "name": "minusql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "minusql.js",
+  "license": "soon",
+  "scripts": {
+    "dev": "run-p api static svelte",
+    "build": "echo \"TODO\"",
+    "static": "pushd examples\\svelte && npm run dev",
+    "svelte": "pushd examples\\svelte && rollup -c -w",
+    "api": "pushd api && npm run dev"
+  },
+  "dependencies": {
+    "graphql": "14.6.0",
+    "npm-run-all": "4.1.5"
+  },
+  "devDependencies": {
+    "eslint": "6.8.0",
+    "eslint-config-standard": "14.1.1",
+    "eslint-plugin-cypress": "2.10.3",
+    "eslint-plugin-graphql": "3.1.1",
+    "eslint-plugin-import": "2.20.2",
+    "eslint-plugin-json": "2.1.1",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-standard": "4.0.1",
+    "eslint-plugin-svelte3": "2.7.3",
+    "prettier": "2.0.5"
+  }
+}
