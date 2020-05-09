@@ -1,7 +1,5 @@
 # MinusQl
 
-TODO: Make public repo soon
-
 [WIP]
 
 Pronounced "minuscule". A less than 2kb (probably) graphql client.

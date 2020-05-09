@@ -1,19 +1,21 @@
 {
   "name": "minusql",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
-  "main": "minusql.js",
-  "license": "soon",
+  "main": "src/index.js",
+  "license": "MIT",
   "scripts": {
     "dev": "run-p api static svelte",
-    "build": "echo \"TODO\"",
+    "build": "rollup -c",
     "static": "pushd examples\\svelte && npm run dev",
     "svelte": "pushd examples\\svelte && rollup -c -w",
     "api": "pushd api && npm run dev"
   },
   "dependencies": {
+    "esm": "3.2.25",
     "graphql": "14.6.0",
-    "npm-run-all": "4.1.5"
+    "npm-run-all": "4.1.5",
+    "rollup-plugin-terser": "5.3.0"
   },
   "devDependencies": {
     "eslint": "6.8.0",
@@ -26,6 +28,7 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.1",
     "eslint-plugin-svelte3": "2.7.3",
-    "prettier": "2.0.5"
+    "prettier": "2.0.5",
+    "rollup": "2.8.2"
   }
 }
