@@ -2,11 +2,17 @@
 
 [WIP]
 
-Pronounced "minuscule". A less than 2kb (probably) graphql client.
+Pronounced "minuscule".
+
+A 3.4kb GraphQL client.
+
+Ships with:
+
+1. A GraphQL template tag package
 
 1. Cache
 
-1. SSR and client friendly
+1. SSR friendly
 
 ## API
 
@@ -24,7 +30,9 @@ export { client, gql }
 
 ### Options
 
- * @param {String!} options.uri - the server address of the GraphQL endpoint
- * @param {Object} options.headers - request headers
- * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
- * @param {Boolean} options.verbose - log errors to console
+| Option         | Type    | Description                                           |
+| -------------- | ------- | ----------------------------------------------------- |
+| uri            | string  | the server address of the GraphQL endpoint            |
+| headers        | Object  | request headers                                       |
+| requestOptions | Object  | addition options to fetch request(refer to fetch api) |
+| verbose        | Boolean | log errors to console                                 |
