@@ -1,6 +1,54 @@
 (function (exports) {
   'use strict';
 
+  function validateResolver(
+    operationType,
+    hasOperation = true,
+    rest = {},
+  ) {
+    if (!hasOperation) {
+      this.verbose &&
+        console.error(
+          `${operationType} method requires an object argument with a '${operationType}' property`,
+        );
+    }
+
+    if (Object.keys(rest).length !== 0) {
+      for (const key of Object.keys(rest)) {
+        this.verbose && console.error(`Error: ${key} is not a valid option`);
+      }
+    }
+  }
+
+  const isEmpty = value =>
+    value === undefined ||
+    value === null ||
+    (value.constructor === Array && value.length === 0) ||
+    (value.constructor === Object && Object.keys(value).length === 0) ||
+    (value.constructor === String && value.trim().length === 0);
+
+  function aggregateOptions(
+    resolver,
+    variables,
+    requestOptions,
+    refetchQuery,
+  ) {
+    const options = {
+      operation: resolver,
+      variables,
+    };
+
+    if (!isEmpty(requestOptions)) {
+      options.requestOptions = requestOptions;
+    }
+
+    if (!isEmpty(refetchQuery)) {
+      options.refetchQuery = refetchQuery;
+    }
+
+    return options
+  }
+
   /**
    * @param {String} Any
    *
@@ -15,13 +63,6 @@
       return [str, err]
     }
   }
-
-  const isEmpty = value =>
-    value === undefined ||
-    value === null ||
-    (value.constructor === Array && value.length === 0) ||
-    (value.constructor === Object && Object.keys(value).length === 0) ||
-    (value.constructor === String && value.trim().length === 0);
 
   /**
    * The cache
@@ -113,101 +154,10 @@
     return this.fetchHandler(options)
   };
 
-  MinusQL.prototype.cache = function cache({
-    operation,
-    operationName,
-    variables,
-    refetchQuery,
-    requestOptions,
-    data,
-    updateItem,
-    deleteItem,
-  }) {
-    let cacheKey;
-
-    if (operation && !updateItem && !deleteItem) {
-      cacheKey = JSON.stringify({
-        query: refetchQuery ? refetchQuery.query : operationName,
-        variables: refetchQuery ? refetchQuery.variables : variables,
-      });
-    }
-
-    // Client side cache works as expected
-    // Server side cache works, but doesn't self isolate in regards to multiple users session data (test by opening different browsers, with different users logged in separately)
-
-    const options = {
-      operation,
-      variables,
-      requestOptions,
-    };
-
-    if (!refetchQuery && data) {
-      cacheStore.set(cacheKey, { ...data, options });
-      // console.log('\nSET CACHE:', cache, '\n')
-      return
-    }
-
-    if (cacheKey && !refetchQuery && !updateItem && !deleteItem) {
-      const value = cacheStore.get(cacheKey);
-      // console.log('\nGET CACHED ITEM:', cache, '\n')
-      return value
-    }
-
-    if (refetchQuery) {
-      // USAGE: Sign out user is a bad example. That's more of an update or delete cache key situation, but this is the syntax.
-
-      // await client.mutation({
-      //   mutation: SIGN_OUT_USER_MUTATION,
-      //   refetchQuery: {
-      //     query: 'CURRENT_USER_QUERY',
-      //     variables: {
-      //       authToken: user.authToken,
-      //     },
-      //   },
-      // })
-      const refetchKey = JSON.stringify(refetchQuery);
-
-      const { options } = cacheStore.get(refetchKey);
-      cacheStore.delete(refetchKey);
-
-      // Get the informations off the cache value to refetch the query
-      this.fetchHandler(options);
-      // console.log('\nREFETCH QUERY:', cache, '\n')
-      return
-    }
-
-    if (updateItem) {
-      const { data, ...keyData } = updateItem;
-      const updateKey = JSON.stringify(keyData);
-      const currentVal = cacheStore.get(updateKey);
-      const options = currentVal && currentVal.options;
-
-      cacheStore.set(updateKey, { data, options });
-
-      // console.log('\nUPDATE CACHE:', cache, '\n')
-      return cacheStore
-    }
-
-    if (deleteItem) {
-      const key = JSON.stringify(deleteItem);
-      const has = cacheStore.has(key);
-
-      if (has) {
-        cacheStore.delete(key);
-      }
-
-      // console.log('\nUPDATE CACHE:', cache, '\n')
-      return cacheStore
-    }
-
-    if (cacheStore.size > 0) {
-      // console.log('\nRETURN CACHE:', cache, '\n')
-      return cacheStore
-    }
-  };
-
   /**
    * Fetch handler
+
+   * @private
    *
    * @param {Object!} options
    * @param {String!} options.operation
@@ -215,7 +165,7 @@
    * @param {Object} options.refetchQuery
    * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
    *
-   * @return {Object} { data, error }
+   * @return {Object} { <resolver_name>, error }
    */
   MinusQL.prototype.fetchHandler = async function fetchHandler({
     operation,
@@ -229,21 +179,23 @@
     const isQuery = operationType === 'query';
     const isMutation = operationType === 'mutation';
 
-    if (isMutation && refetchQuery) {
-      await this.cache({ refetchQuery });
-    }
+    const initializeCacheItemData = {
+      operation,
+      operationName,
+      operationType,
+      variables,
+      refetchQuery,
+      requestOptions,
+      isQuery,
+      isMutation,
+    };
 
-    if (isQuery) {
-      const cacheData = await this.cache({
-        operation,
-        operationName,
-        variables,
-        requestOptions,
-      });
-
-      // If there is data in the cache, return it
-      if (cacheData) {
-        return { ...cacheData, error: null }
+    // If there is data in the cache, return that data
+    const cacheData = await this.preCacheHandler(initializeCacheItemData);
+    if (cacheData) {
+      return {
+        ...cacheData,
+        error: null,
       }
     }
 
@@ -261,7 +213,7 @@
 
     let resErrors = {};
 
-    // console.log("-----------I'M FETCHING!-----------")
+    console.log("-----------I'M FETCHING!-----------");
     const res = await fetch(this.uri, options).catch(err => {
       this.verbose && console.error(err);
 
@@ -357,43 +309,160 @@
 
     // Set data in cache
     if (isQuery) {
-      await this.cache({ operation, variables, data });
+      await this.cache(initializeCacheItemData);
     }
 
     return { ...data.data, error: res.ok && null }
   };
 
-  function validateResolver(operationType, hasOperation = true, rest = {}) {
-    if (!hasOperation) {
-      this.verbose &&
-        console.error(
-          `${operationType} method requires an object argument with a '${operationType}' property`,
-        );
+  /**
+   * Cache handler method
+   *
+   * @param {Object!} options
+   * @param {String} options.refetchQuery
+   * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
+   * TODO: write types
+   */
+  MinusQL.prototype.cache = function cache({
+    operation,
+    operationName,
+    variables,
+    refetchQuery,
+    requestOptions,
+    data,
+    updateItem,
+    deleteItem,
+  }) {
+    let cacheKey;
+
+    if (operation && !updateItem && !deleteItem) {
+      cacheKey = JSON.stringify({
+        query: refetchQuery ? refetchQuery.query : operationName,
+        variables: refetchQuery ? refetchQuery.variables : variables,
+      });
     }
 
-    if (Object.keys(rest).length !== 0) {
-      for (const key of Object.keys(rest)) {
-        this.verbose && console.error(`Error: ${key} is not a valid option`);
-      }
-    }
-  }
+    // Client side cache works as expected
+    // Server side cache works, but doesn't self isolate in regards to multiple users session data (test by opening different browsers, with different users logged in separately)
 
-  function aggregateOptions(resolver, variables, requestOptions, refetchQuery) {
+    const keyIsCached = cacheStore.has(cacheKey);
+
+    console.log('cacheKey:', cacheKey);
+    console.log('keyIsCached:', keyIsCached);
+
     const options = {
-      operation: resolver,
+      operation,
       variables,
+      requestOptions,
     };
 
-    if (!isEmpty(requestOptions)) {
-      options.requestOptions = requestOptions;
+    if (!keyIsCached && !refetchQuery && data) {
+      cacheStore.set(cacheKey, { ...data, options });
+      console.log('\nSET CACHE:', cacheStore, '\n');
+      return
     }
 
-    if (!isEmpty(refetchQuery)) {
-      options.refetchQuery = refetchQuery;
+    if (keyIsCached && cacheKey && !refetchQuery && !updateItem && !deleteItem) {
+      const value = cacheStore.get(cacheKey);
+      console.log('\nGET CACHED ITEM:', cacheStore, '\n');
+      return value
     }
 
-    return options
-  }
+    if (refetchQuery) {
+      // USAGE: Sign out user is a bad example. That's more of an update or delete cache key situation, but this is the syntax.
+
+      // await client.mutation({
+      //   mutation: SIGN_OUT_USER_MUTATION,
+      //   refetchQuery: {
+      //     query: 'CURRENT_USER_QUERY',
+      //     variables: {
+      //       authToken: user.authToken,
+      //     },
+      //   },
+      // })
+      const refetchKey = JSON.stringify(refetchQuery);
+      console.log('refetchKey:', refetchKey);
+
+      const cs = cacheStore.get(refetchKey);
+      console.log('cs:', cs);
+      cacheStore.delete(refetchKey);
+
+      // Get the informations off the cache value to refetch the query
+      this.fetchHandler(options);
+      console.log('\nREFETCH QUERY:', cacheStore, '\n');
+      return
+    }
+
+    if (updateItem) {
+      const { data, ...keyData } = updateItem;
+      const updateKey = JSON.stringify(keyData);
+      const currentVal = cacheStore.get(updateKey);
+      const options = currentVal && currentVal.options;
+
+      cacheStore.set(updateKey, { data, options });
+
+      console.log('\nUPDATE CACHE:', cacheStore, '\n');
+      return cacheStore
+    }
+
+    if (deleteItem) {
+      const key = JSON.stringify(deleteItem);
+      const has = cacheStore.has(key);
+
+      if (has) {
+        cacheStore.delete(key);
+      }
+
+      console.log('\nUPDATE CACHE:', cacheStore, '\n');
+      return cacheStore
+    }
+
+    if (cacheStore.size > 0) {
+      console.log('\nRETURN CACHE:', cacheStore, '\n');
+      return cacheStore
+    }
+  };
+
+  /**
+   * Pre-Cache handler method
+   *
+   * @private
+   * @param {Object!} options
+   * @param {String} options.refetchQuery
+   * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
+   * TODO: write types
+   */
+  MinusQL.prototype.preCacheHandler = async function preCacheHandler({
+    operation,
+    operationName,
+    operationType,
+    variables,
+    refetchQuery = null,
+    requestOptions,
+    isMutation,
+  }) {
+    const initializeCacheItemData = {
+      operation,
+      operationName,
+      operationType,
+      variables,
+      refetchQuery,
+      requestOptions,
+    };
+
+    if (isMutation && refetchQuery) {
+      await this.cache({ refetchQuery });
+      return null
+    }
+
+    const cacheData = await this.cache(initializeCacheItemData);
+    console.log('cacheData:', cacheData);
+
+    // If there is data in the cache, return it
+    if (cacheData) {
+      return cacheData
+    }
+  };
 
   function gql(strings, ...pieces) {
     return String.raw({ raw: normalizeStr(strings[0]) }, ...pieces)

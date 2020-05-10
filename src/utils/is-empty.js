@@ -1,6 +1,8 @@
-export const isEmpty = value =>
+const isEmpty = value =>
   value === undefined ||
   value === null ||
   (value.constructor === Array && value.length === 0) ||
   (value.constructor === Object && Object.keys(value).length === 0) ||
   (value.constructor === String && value.trim().length === 0)
+
+export default isEmpty

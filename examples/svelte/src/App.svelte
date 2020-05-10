@@ -5,10 +5,8 @@
   import { client, gql } from './graphql.js'
 
   let value = ''
-  $: console.log('value:', value)
   let todos
   $: todos = todos
-  $: console.log('todos:', todos)
 
   const GET_ALL_TODOS_QUERY = gql`
     query GET_ALL_TODOS_QUERY {
@@ -19,12 +17,6 @@
       }
     }
   `
-
-  // const HOLA_MUTATION = gql`
-  //   mutation HOLA_MUTATION($greeting: String) {
-  //     hola(greeting: $greeting)
-  //   }
-  // `
 
   onMount(async () => {
     const { getAllTodos, error } = await client.query({
@@ -38,32 +30,53 @@
     // setTimeout(() => {
     todos = getAllTodos
     // }, 5000)
-
-    //   const { hola, error } = await client.mutation({
-    //     mutation: HOLA_MUTATION,
-    //     variables: { greeting: 'Hello' },
-    //   })
-
-    //   if (error) {
-    //     console.error('error:', error)
-    //   }
-
-    //   mutationData = hola
   })
+
+  async function createTodo(e) {
+    e.preventDefault()
+
+    const CREATE_TODO_MUTATION = gql`
+      mutation CREATE_TODO_MUTATION($input: TodoInput!) {
+        createTodo(input: $input) {
+          id
+          todo
+          completed
+        }
+      }
+    `
+    const { createTodo, error } = await client.mutation({
+      mutation: CREATE_TODO_MUTATION,
+      variables: {
+        input: {
+          todo: value,
+          completed: false,
+        },
+      },
+    })
+
+    if (error) {
+      console.error('error:', error)
+    }
+
+    value = ''
+    console.log('createTodo:', createTodo)
+  }
 </script>
 
 <main>
   <h1>My Todos</h1>
 
-  <label for="todo-input">
-    <span />
-    <input
-      id="todo-input"
-      type="text"
-      on:keydown={e => (value = e.target.value)}
-      {value}
-    />
-  </label>
+  <form on:submit={createTodo}>
+    <label for="todo-input">
+      <span>Add todo:</span>
+      <input
+        id="todo-input"
+        type="text"
+        on:keydown={e => (value = e.target.value)}
+        {value}
+      />
+    </label>
+  </form>
 
   {#if todos}
     <ul>
@@ -83,21 +96,23 @@
 </main>
 
 <style>
+  form {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
   label {
     display: block;
     text-align: center;
   }
 
   label > span {
-    display: block;
     font-size: 24px;
     font-weight: bold;
   }
 
   label > input {
-    display: block;
     margin: 8px auto 0;
-    max-width: 500px;
     width: 100%;
   }
 </style>

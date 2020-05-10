@@ -1,14 +1,47 @@
 <script>
+  import { client, gql } from './graphql.js'
+
   export let todo
-  $: console.log('todo:', todo)
+
+  async function updateTodo() {
+    const UPDATE_TODO_MUTATION = gql`
+      mutation UPDATE_TODO_MUTATION($id: ID!, $todo: TodoInput!) {
+        updateTodo(id: $id, todo: $todo)
+      }
+    `
+
+    const { updateTodo, error } = await client.mutation({
+      mutation: UPDATE_TODO_MUTATION,
+      variables: {
+        id: todo.id,
+        todo: {
+          completed: true,
+        },
+      },
+      refetchQuery: {
+        query: 'GET_ALL_TODOS_QUERY',
+      },
+    })
+
+    if (error) {
+      console.error(error)
+    }
+
+    console.log('updateTodo:', updateTodo)
+  }
 </script>
 
 <li id={todo.id}>
   <label for="todo_{todo.id}">
-    <input id="todo_{todo.id}" type="checkbox" checked={todo.completed} />
+    <input
+      id="todo_{todo.id}"
+      on:change={updateTodo}
+      type="checkbox"
+      checked={todo.completed}
+    />
+    <span>{todo.todo}</span>
   </label>
 
-  <span>{todo.todo}</span>
 </li>
 
 <style>
