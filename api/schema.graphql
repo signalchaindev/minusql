@@ -1,15 +1,21 @@
 type Query {
-  hello: String
-  test: String
-  products: [Product]
+  getTodoById(id: ID!): Todo!
+  getAllTodos: [Todo!]!
 }
 
 type Mutation {
-  hola(greeting: String): String
+  createTodo(todo: String!): Todo
+  deleteTodo(id: ID!): String
+  updateTodo(id: ID!, todo: TodoInput!): String
 }
 
-type Product {
-  name: String
-  thing: String
-  example: String
+type Todo {
+  id: ID!
+  todo: String!
+  completed: Boolean!
+}
+
+input TodoInput {
+  todo: String
+  completed: Boolean
 }

@@ -11,11 +11,7 @@ const gqlServerEndpoint = 'http://localhost:3001'
 const gqlServerPath = '__playground'
 
 const corsOptions = {
-  origin: [
-    frontendUrl,
-    'http://http://localhost:3001',
-    'http://localhost:3002',
-  ],
+  origin: '*',
   credentials: true,
   methods: 'GET,POST,PUT,PATCH,DELETE',
   preflightContinue: false,

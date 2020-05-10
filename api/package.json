@@ -5,7 +5,7 @@
   "main": "server.js",
   "author": "James gleason",
   "scripts": {
-    "dev": "nodemon -r esm server.js"
+    "dev": "nodemon -r esm -e js,graphql server.js"
   },
   "dependencies": {
     "apollo-server-express": "2.13.0",

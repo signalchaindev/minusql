@@ -1,4 +1,4 @@
-# MinusQl
+# MinusQl (working title)
 
 [WIP]
 
@@ -33,6 +33,6 @@ export { client, gql }
 | Option         | Type    | Description                                           |
 | -------------- | ------- | ----------------------------------------------------- |
 | uri            | string  | the server address of the GraphQL endpoint            |
-| headers        | Object  | request headers                                       |
-| requestOptions | Object  | addition options to fetch request(refer to fetch api) |
-| verbose        | Boolean | log errors to console                                 |
+| headers        | object  | request headers                                       |
+| requestOptions | object  | addition options to fetch request(refer to fetch api) |
+| verbose        | boolean | log errors to console                                 |

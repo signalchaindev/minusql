@@ -1,5 +1,5 @@
-import safeJsonParse from './safe-json-parse.js'
-import { isEmpty } from './isEmpty.js'
+import safeJsonParse from './utils/safe-json-parse.js'
+import { isEmpty } from './utils/isEmpty.js'
 
 /**
  * The cache
