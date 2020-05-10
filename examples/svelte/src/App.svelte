@@ -1,73 +1,103 @@
 <script>
   import { onMount } from 'svelte'
+  import Todo from './Todo.svelte'
+  import Loading from './Loading.svelte'
   import { client, gql } from './graphql.js'
 
-  let queryData
-  $: queryData = queryData
-  let mutationData
-  $: mutationData = mutationData
+  let value = ''
+  $: console.log('value:', value)
+  let todos
+  $: todos = todos
+  $: console.log('todos:', todos)
 
-  const HELLO_QUERY = gql`
-    query HELLO_QUERY {
-      hello
-      t: test
-      nameThing: products {
-        name
-        ...ThingField
+  const GET_ALL_TODOS_QUERY = gql`
+    query GET_ALL_TODOS_QUERY {
+      getAllTodos {
+        id
+        todo
+        completed
       }
-
-      exampleThing: products {
-        example
-        ...ThingField
-      }
-    }
-
-    fragment ThingField on Product {
-      thing
     }
   `
 
-  const HOLA_MUTATION = gql`
-    mutation HOLA_MUTATION($greeting: String) {
-      hola(greeting: $greeting)
+  // const HOLA_MUTATION = gql`
+  //   mutation HOLA_MUTATION($greeting: String) {
+  //     hola(greeting: $greeting)
+  //   }
+  // `
+
+  onMount(async () => {
+    const { getAllTodos, error } = await client.query({
+      query: GET_ALL_TODOS_QUERY,
+    })
+
+    if (error) {
+      console.error('error:', error)
     }
-  `
 
-  onMount(() => {
-    async function query() {
-      const { t, hello, nameThing, exampleThing, error } = await client.query({
-        query: HELLO_QUERY,
-      })
+    // setTimeout(() => {
+    todos = getAllTodos
+    // }, 5000)
 
-      if (error) {
-        console.error('error:', error)
-      }
+    //   const { hola, error } = await client.mutation({
+    //     mutation: HOLA_MUTATION,
+    //     variables: { greeting: 'Hello' },
+    //   })
 
-      queryData = { t, hello, nameThing, exampleThing }
-    }
-    query()
+    //   if (error) {
+    //     console.error('error:', error)
+    //   }
 
-    async function mutation() {
-      const { hola, error } = await client.mutation({
-        mutation: HOLA_MUTATION,
-        variables: { greeting: 'Hello' },
-      })
-
-      if (error) {
-        console.error('error:', error)
-      }
-
-      mutationData = hola
-    }
-    mutation()
+    //   mutationData = hola
   })
 </script>
 
 <main>
-  <h1>{queryData && queryData.hello}</h1>
-  <h1>{queryData && queryData.t}</h1>
-  <h1>{mutationData && mutationData}</h1>
+  <h1>My Todos</h1>
 
-  <pre>{JSON.stringify(queryData && queryData.nameThing, null, 2)}</pre>
-  <pre>{JSON.stringify(queryData && queryData.exampleThing, null, 2)}</pre>
+  <label for="todo-input">
+    <span />
+    <input
+      id="todo-input"
+      type="text"
+      on:keydown={e => (value = e.target.value)}
+      {value}
+    />
+  </label>
+
+  {#if todos}
+    <ul>
+      {#each todos as todo}
+        <Todo {todo} />
+      {/each}
+    </ul>
+  {:else}
+    <Loading />
+  {/if}
+
+  <!-- {#await todos}
+    {#each todos as todo}
+      <Todo {todo} />
+    {/each}
+  {/await} -->
 </main>
+
+<style>
+  label {
+    display: block;
+    text-align: center;
+  }
+
+  label > span {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  label > input {
+    display: block;
+    margin: 8px auto 0;
+    max-width: 500px;
+    width: 100%;
+  }
+</style>

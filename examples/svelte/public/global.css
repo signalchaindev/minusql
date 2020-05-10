@@ -8,7 +8,24 @@ main {
 }
 
 h1 {
-  font-size: 4em;
-  font-weight: 100;
+  font-size: 32px;
+  font-weight: 300;
+  margin: 0 0 8px;
+  text-align: center;
   text-transform: uppercase;
+}
+
+ul {
+  padding: 0px;
+}
+
+li {
+  list-style-type: none;
+}
+
+input {
+  font-size: 16px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 8px 12px;
 }
