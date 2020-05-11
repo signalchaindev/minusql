@@ -24,7 +24,7 @@
     })
 
     if (error) {
-      console.error('error:', error)
+      console.error(error)
     }
 
     // setTimeout(() => {

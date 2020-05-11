@@ -173,72 +173,32 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
     }),
   }
 
-  let resErrors = {}
-
   console.log("-----------I'M FETCHING!-----------")
-  const res = await fetch(this.uri, options).catch(err => {
-    this.verbose && console.error(err)
-
-    resErrors = {
-      message: err,
-      stack: null,
-      details: null,
-    }
-  })
-
-  if (!res) {
-    return {
-      data: null,
-      error: { message: 'Request failed' },
-    }
-  }
-
-  const data = await res.json().catch(err => {
-    this.verbose && console.error(err)
-
-    resErrors = {
-      message: err,
-      stack: null,
-      details: null,
-    }
-  })
-
-  if (!data) {
-    return {
-      data: null,
-      error: { message: resErrors.message },
-    }
-  }
+  const res = await fetch(this.uri, options)
+  const data = await res.json()
 
   /**
    * message {String}
    * stack {Object}
    * details {Array}
    */
+  let resErrors = {}
   resErrors = {
     message: res.statusText,
     stack: res,
     details: data && data.errors,
   }
 
-  // if data in response is 'null'
-  if (!data) {
-    resErrors.details = [
-      ...resErrors.details,
-      { message: `Bad Response: ${data || null}` },
-    ]
-  }
-
-  // if all properties of data are 'null'
+  // if the response doesn't return anything
   const allDataKeyEmpty = Object.keys(data).every(key => !data[key])
   if (allDataKeyEmpty) {
     resErrors.details = [
       ...resErrors.details,
-      { message: `Bad Response: ${data || null}` },
+      { message: `No Response: ${data || null}` },
     ]
   }
 
-  // If the Request fails, short circuit
+  // If the Request fails, return errors and stop execution
   if (!res.ok || (data && data.errors && data.errors.length !== 0)) {
     const clientErrors = {}
     this.verbose && console.error('Error:', resErrors)
@@ -248,10 +208,8 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
 
       if (typeof result === 'string') {
         if (result === '[object Object]') {
-          this.verbose &&
-            console.error('Error: thrown errors must be of type string')
+          throw Error('Error messages must be of type string')
         }
-        this.verbose && console.error(`Error: ${result}`)
 
         clientErrors.message = result
       } else {
