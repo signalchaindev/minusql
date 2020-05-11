@@ -1,7 +1,8 @@
-import validateResolver from './utils/validate-resolver.js'
 import aggregateOptions from './utils/aggregate-options.js'
+// TODO: fix SSR
+// import fetch from './utils/iso-fetch.js'
 import safeJsonParse from './utils/safe-json-parse.js'
-import isEmpty from './utils/is-empty.js'
+import validateResolver from './utils/validate-resolver.js'
 
 /**
  * The cache
@@ -30,10 +31,7 @@ function MinusQL({ uri, credentials, headers, requestOptions, verbose }) {
       ...headers,
     },
     credentials: credentials || 'include',
-  }
-
-  if (!isEmpty(requestOptions)) {
-    this.requestObject.requestOptions = requestOptions
+    ...requestOptions,
   }
 
   if (verbose) {
@@ -61,7 +59,8 @@ MinusQL.prototype.query = function query({
 }) {
   const hasOperation = !!query
   validateResolver('query', hasOperation, rest)
-  const options = aggregateOptions(query, variables, requestOptions)
+  const options = aggregateOptions({ query, variables, requestOptions })
+  // TODO: wrap in error handler
   return this.fetchHandler(options)
 }
 
@@ -72,7 +71,7 @@ MinusQL.prototype.query = function query({
  * @param {String!} options.mutation
  * @param {Object} options.variables
  * @param {Object} options.requestOptions - addition options to fetch request (refer to fetch api)
- * @param {String} options.refetchQuery
+ * @param {String} options.refetchQuery - name of query whose data you wish to update in the cache
  *
  * @return {Object} *
  * @return {Object} *.<mutation_name> - contains all query data where the name of the query is the key
@@ -88,27 +87,30 @@ MinusQL.prototype.mutation = function mutation({
   validateResolver(rest)
   const hasOperation = !!mutation
   validateResolver('mutation', hasOperation, rest)
-  const options = aggregateOptions(
+  const options = aggregateOptions({
     mutation,
     variables,
     requestOptions,
     refetchQuery,
-  )
+  })
+  // TODO: wrap in error handler
   return this.fetchHandler(options)
 }
 
 /**
  * Fetch handler
-
+ *
  * @private
  *
  * @param {Object!} options
- * @param {String!} options.operation
- * @param {Object} options.variables
- * @param {Object} options.refetchQuery
+ * @param {String!} options.operation - gql query string
+ * @param {Object} options.variables - resolver variables
  * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
+ * @param {String} options.refetchQuery - name of query whose data you wish to update in the cache (mutation only)
  *
- * @return {Object} { <resolver_name>, error }
+ * @return {Object} *
+ * @return {Object} *.<resolver_name>
+ * @return {Object} *.error
  */
 MinusQL.prototype.fetchHandler = async function fetchHandler({
   operation,
@@ -116,8 +118,8 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
   refetchQuery = null,
   requestOptions,
 }) {
-  const [operationType, name] = operation.split(' ')
-  const [operationName] = name.split('(')
+  const [operationType, name] = operation && operation.split(' ')
+  const [operationName] = name && name.split('(')
 
   const isQuery = operationType === 'query'
   const isMutation = operationType === 'mutation'
@@ -133,18 +135,13 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
     isMutation,
   }
 
-  // // If there is data in the cache, return that data
-  // const cacheData = await this.preCacheHandler(initializeCacheItemData)
-  // if (cacheData) {
-  //   return {
-  //     ...cacheData,
-  //     error: null,
-  //   }
-  // }
-
-  const body = {
-    query: operation,
-    variables,
+  // If there is data in the cache, return that data
+  const cacheData = await this.preCacheHandler(initializeCacheItemData)
+  if (cacheData) {
+    return {
+      ...cacheData,
+      error: null,
+    }
   }
 
   console.log('this.requestObject:', this.requestObject)
@@ -152,7 +149,10 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
   const options = {
     ...this.requestObject,
     ...requestOptions,
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      query: operation,
+      variables,
+    }),
   }
 
   let resErrors = {}
