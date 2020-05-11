@@ -43,8 +43,8 @@ function MinusQL({ uri, credentials, headers, requestOptions, verbose }) {
  * Query method
  *
  * @param {Object!} options
- * @param {String!} options.query
- * @param {Object} options.variables
+ * @param {String!} options.query - gql query string
+ * @param {Object} options.variables - query variables
  * @param {Object} options.requestOptions - additional options to fetch request (refer to fetch api)
  *
  * @return {Object} *
@@ -59,17 +59,29 @@ MinusQL.prototype.query = function query({
 }) {
   const hasOperation = !!query
   validateResolver('query', hasOperation, rest)
-  const options = aggregateOptions({ query, variables, requestOptions })
-  // TODO: wrap in error handler
+  if (!hasOperation) return
+
+  const options = aggregateOptions({
+    operation: query,
+    variables,
+    requestOptions,
+  })
+
   return this.fetchHandler(options)
+    .then(res => {
+      return res
+    })
+    .catch(err => {
+      console.error(err)
+    })
 }
 
 /**
  * Mutation method
  *
  * @param {Object!} options
- * @param {String!} options.mutation
- * @param {Object} options.variables
+ * @param {String!} options.mutation - gql mutation string
+ * @param {Object} options.variables - mutation variables
  * @param {Object} options.requestOptions - addition options to fetch request (refer to fetch api)
  * @param {String} options.refetchQuery - name of query whose data you wish to update in the cache
  *
@@ -87,14 +99,22 @@ MinusQL.prototype.mutation = function mutation({
   validateResolver(rest)
   const hasOperation = !!mutation
   validateResolver('mutation', hasOperation, rest)
+  if (!hasOperation) return
+
   const options = aggregateOptions({
-    mutation,
+    operation: mutation,
     variables,
     requestOptions,
     refetchQuery,
   })
-  // TODO: wrap in error handler
+
   return this.fetchHandler(options)
+    .then(res => {
+      return res
+    })
+    .catch(err => {
+      console.error(err)
+    })
 }
 
 /**
@@ -136,7 +156,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
   }
 
   // If there is data in the cache, return that data
-  const cacheData = await this.preCacheHandler(initializeCacheItemData)
+  const cacheData = await this.preFetchHandler(initializeCacheItemData)
   if (cacheData) {
     return {
       ...cacheData,
@@ -144,8 +164,6 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
     }
   }
 
-  console.log('this.requestObject:', this.requestObject)
-  console.log('requestOptions:', requestOptions)
   const options = {
     ...this.requestObject,
     ...requestOptions,
@@ -267,7 +285,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
  * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
  * TODO: write types
  */
-MinusQL.prototype.cache = function cache({
+MinusQL.prototype.cache = async function cache({
   operation,
   operationName,
   variables,
@@ -290,9 +308,6 @@ MinusQL.prototype.cache = function cache({
   // Server side cache works, but doesn't self isolate in regards to multiple users session data (test by opening different browsers, with different users logged in separately)
 
   const keyIsCached = cacheStore.has(cacheKey)
-
-  console.log('cacheKey:', cacheKey)
-  console.log('keyIsCached:', keyIsCached)
 
   const options = {
     operation,
@@ -376,7 +391,7 @@ MinusQL.prototype.cache = function cache({
  * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
  * TODO: write types
  */
-MinusQL.prototype.preCacheHandler = async function preCacheHandler({
+MinusQL.prototype.preFetchHandler = async function preFetchHandler({
   operation,
   operationName,
   operationType,
@@ -400,7 +415,6 @@ MinusQL.prototype.preCacheHandler = async function preCacheHandler({
   }
 
   const cacheData = await this.cache(initializeCacheItemData)
-  console.log('cacheData:', cacheData)
 
   // If there is data in the cache, return it
   if (cacheData) {

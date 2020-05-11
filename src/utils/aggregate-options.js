@@ -1,13 +1,13 @@
 import isEmpty from './is-empty.js'
 
 export default function aggregateOptions({
-  resolver,
+  operation,
   variables,
   requestOptions,
   refetchQuery,
 }) {
   const options = {
-    operation: resolver,
+    operation,
     variables,
   }
 
