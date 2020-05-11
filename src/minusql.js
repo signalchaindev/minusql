@@ -47,9 +47,11 @@ function MinusQL({ uri, credentials, headers, requestOptions, verbose }) {
  * @param {Object!} options
  * @param {String!} options.query
  * @param {Object} options.variables
- * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
+ * @param {Object} options.requestOptions - additional options to fetch request (refer to fetch api)
  *
- * @return {Object} { data, error }
+ * @return {Object} *
+ * @return {Object} *.<query_name> - contains all query data where the name of the query is the key
+ * @return {Object} *.error
  */
 MinusQL.prototype.query = function query({
   query,
@@ -69,10 +71,12 @@ MinusQL.prototype.query = function query({
  * @param {Object!} options
  * @param {String!} options.mutation
  * @param {Object} options.variables
+ * @param {Object} options.requestOptions - addition options to fetch request (refer to fetch api)
  * @param {String} options.refetchQuery
- * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
  *
- * @return {Object} { data, error }
+ * @return {Object} *
+ * @return {Object} *.<mutation_name> - contains all query data where the name of the query is the key
+ * @return {Object} *.error
  */
 MinusQL.prototype.mutation = function mutation({
   mutation,
@@ -129,21 +133,22 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
     isMutation,
   }
 
-  // If there is data in the cache, return that data
-  const cacheData = await this.preCacheHandler(initializeCacheItemData)
-  if (cacheData) {
-    return {
-      ...cacheData,
-      error: null,
-    }
-  }
+  // // If there is data in the cache, return that data
+  // const cacheData = await this.preCacheHandler(initializeCacheItemData)
+  // if (cacheData) {
+  //   return {
+  //     ...cacheData,
+  //     error: null,
+  //   }
+  // }
 
   const body = {
-    operationName,
     query: operation,
     variables,
   }
 
+  console.log('this.requestObject:', this.requestObject)
+  console.log('requestOptions:', requestOptions)
   const options = {
     ...this.requestObject,
     ...requestOptions,

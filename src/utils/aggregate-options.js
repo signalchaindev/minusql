@@ -11,12 +11,12 @@ export default function aggregateOptions(
     variables,
   }
 
-  if (!isEmpty(requestOptions)) {
-    options.requestOptions = requestOptions
-  }
-
   if (!isEmpty(refetchQuery)) {
     options.refetchQuery = refetchQuery
+  }
+
+  if (!isEmpty(requestOptions)) {
+    options.requestOptions = requestOptions
   }
 
   return options

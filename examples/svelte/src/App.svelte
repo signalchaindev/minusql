@@ -8,17 +8,17 @@
   let todos
   $: todos = todos
 
-  const GET_ALL_TODOS_QUERY = gql`
-    query GET_ALL_TODOS_QUERY {
-      getAllTodos {
-        id
-        todo
-        completed
-      }
-    }
-  `
-
   onMount(async () => {
+    const GET_ALL_TODOS_QUERY = gql`
+      query GET_ALL_TODOS_QUERY {
+        getAllTodos {
+          id
+          todo
+          completed
+        }
+      }
+    `
+
     const { getAllTodos, error } = await client.query({
       query: GET_ALL_TODOS_QUERY,
     })
@@ -32,9 +32,7 @@
     // }, 5000)
   })
 
-  async function createTodo(e) {
-    e.preventDefault()
-
+  async function createTodo() {
     const CREATE_TODO_MUTATION = gql`
       mutation CREATE_TODO_MUTATION($input: TodoInput!) {
         createTodo(input: $input) {
@@ -66,7 +64,7 @@
 <main>
   <h1>My Todos</h1>
 
-  <form on:submit={createTodo}>
+  <form on:submit|preventDefault={createTodo}>
     <label for="todo-input">
       <span>Add todo:</span>
       <input
