@@ -100,7 +100,6 @@ MinusQL.prototype.mutation = function mutation({
   deleteItem,
   ...rest
 }) {
-  validateResolver(rest)
   const hasOperation = !!mutation
   validateResolver('mutation', hasOperation, rest)
   if (!hasOperation) return
@@ -145,6 +144,8 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
   variables,
   requestOptions,
   refetchQuery,
+  updateItem,
+  deleteItem,
 }) {
   const [operationType, name] = operation && operation.split(' ')
   const [operationName] = name && name.split('(')
@@ -162,8 +163,8 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
     isQuery,
     isMutation,
     data: null,
-    updateItem: null,
-    deleteItem: null,
+    updateItem,
+    deleteItem,
   }
 
   // If there is data in the cache, return that data
