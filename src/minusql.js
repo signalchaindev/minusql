@@ -84,6 +84,8 @@ MinusQL.prototype.query = function query({
  * @param {Object} options.variables - mutation variables
  * @param {Object} options.requestOptions - addition options to fetch request (refer to fetch api)
  * @param {String} options.refetchQuery - name of query whose data you wish to update in the cache
+ * @param {TBD} options.updateItem
+ * @param {TBD} options.deleteItem
  *
  * @return {Object} *
  * @return {Object} *.<mutation_name> - contains all query data where the name of the query is the key
@@ -92,8 +94,10 @@ MinusQL.prototype.query = function query({
 MinusQL.prototype.mutation = function mutation({
   mutation,
   variables,
-  refetchQuery = null,
   requestOptions,
+  refetchQuery,
+  updateItem,
+  deleteItem,
   ...rest
 }) {
   validateResolver(rest)
@@ -106,6 +110,8 @@ MinusQL.prototype.mutation = function mutation({
     variables,
     requestOptions,
     refetchQuery,
+    updateItem,
+    deleteItem,
   })
 
   return this.fetchHandler(options)
@@ -126,7 +132,9 @@ MinusQL.prototype.mutation = function mutation({
  * @param {String!} options.operation - gql query string
  * @param {Object} options.variables - resolver variables
  * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
- * @param {String} options.refetchQuery - name of query whose data you wish to update in the cache (mutation only)
+ * @param {String} options.refetchQuery (mutation only) - name of query whose data you wish to update in the cache
+ * @param {TBD} options.updateItem (mutation only)
+ * @param {TBD} options.deleteItem (mutation only)
  *
  * @return {Object} *
  * @return {Object} *.<resolver_name>
@@ -135,8 +143,8 @@ MinusQL.prototype.mutation = function mutation({
 MinusQL.prototype.fetchHandler = async function fetchHandler({
   operation,
   variables,
-  refetchQuery = null,
   requestOptions,
+  refetchQuery,
 }) {
   const [operationType, name] = operation && operation.split(' ')
   const [operationName] = name && name.split('(')
@@ -153,6 +161,9 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
     requestOptions,
     isQuery,
     isMutation,
+    data: null,
+    updateItem: null,
+    deleteItem: null,
   }
 
   // If there is data in the cache, return that data
@@ -176,6 +187,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
   console.log("-----------I'M FETCHING!-----------")
   const res = await fetch(this.uri, options)
   const data = await res.json()
+  initializeCacheItemData.data = data
 
   /**
    * message {String}
@@ -235,6 +247,22 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
   return { ...data.data, error: res.ok && null }
 }
 
+function generateCacheKey({
+  operation,
+  operationName,
+  variables,
+  refetchQuery,
+  updateItem,
+  deleteItem,
+}) {
+  if (operation && !updateItem && !deleteItem) {
+    return JSON.stringify({
+      query: refetchQuery ? refetchQuery.query : operationName,
+      variables: refetchQuery ? refetchQuery.variables : variables,
+    })
+  }
+}
+
 /**
  * Cache handler method
  *
@@ -246,21 +274,24 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
 MinusQL.prototype.cache = async function cache({
   operation,
   operationName,
+  operationType,
   variables,
   refetchQuery,
   requestOptions,
+  isQuery,
+  isMutation,
   data,
   updateItem,
   deleteItem,
 }) {
-  let cacheKey
-
-  if (operation && !updateItem && !deleteItem) {
-    cacheKey = JSON.stringify({
-      query: refetchQuery ? refetchQuery.query : operationName,
-      variables: refetchQuery ? refetchQuery.variables : variables,
-    })
-  }
+  let cacheKey = generateCacheKey({
+    operation,
+    operationName,
+    variables,
+    refetchQuery,
+    updateItem,
+    deleteItem,
+  })
 
   // Client side cache works as expected
   // Server side cache works, but doesn't self isolate in regards to multiple users session data (test by opening different browsers, with different users logged in separately)
@@ -354,17 +385,34 @@ MinusQL.prototype.preFetchHandler = async function preFetchHandler({
   operationName,
   operationType,
   variables,
-  refetchQuery = null,
+  refetchQuery,
   requestOptions,
   isMutation,
+  updateItem,
+  deleteItem,
 }) {
   const initializeCacheItemData = {
     operation,
     operationName,
     operationType,
     variables,
-    refetchQuery,
     requestOptions,
+    refetchQuery,
+    updateItem,
+    deleteItem,
+  }
+
+  // TODO: I feel like we need to check for duplicate cache keys, but haven't been able to produce a test case yet
+  let cacheKey = generateCacheKey(initializeCacheItemData)
+  const keyIsCached = cacheStore.has(cacheKey)
+  if (keyIsCached) {
+    const inCacheData = cacheStore.get(cacheKey)
+    console.log('inCacheData:', inCacheData)
+    console.warn(
+      `${
+        cacheKey.split(':')[1]
+      } has been already declared. This may result in unexpected behavior.`,
+    )
   }
 
   if (isMutation && refetchQuery) {
