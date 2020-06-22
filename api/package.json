@@ -8,7 +8,7 @@
     "dev": "nodemon -r esm -e js,graphql server.js"
   },
   "dependencies": {
-    "apollo-server-express": "2.13.0",
+    "apollo-server-express": "2.14.2",
     "cors": "2.8.5",
     "esm": "3.2.25",
     "express": "4.17.1",
