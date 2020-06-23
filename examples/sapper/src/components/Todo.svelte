@@ -1,5 +1,6 @@
 <script>
   import { client, gql } from '../graphql.js'
+  import slugify from 'slugify'
 
   export let todo
 
@@ -15,7 +16,7 @@
       variables: {
         id: todo.id,
         todo: {
-          completed: true,
+          completed: todo.completed,
         },
       },
       refetchQuery: {
@@ -41,6 +42,8 @@
     />
     <span>{todo.todo}</span>
   </label>
+  &nbsp
+  <a href={slugify(todo.todo).toLowerCase()}>notes</a>
 </li>
 
 <style>
@@ -64,5 +67,9 @@
 
   span {
     margin-left: 8px;
+  }
+
+  a {
+    color: inherit;
   }
 </style>

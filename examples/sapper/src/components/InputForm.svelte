@@ -1,7 +1,8 @@
 <script>
   import { client, gql } from '../graphql.js'
 
-  let value = ''
+  $: value = ''
+  $: console.log('value:', value)
 
   async function createTodo() {
     const CREATE_TODO_MUTATION = gql`
@@ -22,13 +23,13 @@
         },
       },
     })
+    console.log('createTodo:', createTodo)
 
     if (error) {
       console.error('error:', error)
     }
 
     value = ''
-    console.log('createTodo:', createTodo)
   }
 </script>
 
@@ -38,7 +39,7 @@
     <input
       id="todo-input"
       type="text"
-      on:keydown={e => (value = e.target.value)}
+      on:keyup={e => (value = e.target.value)}
       {value}
     />
   </label>

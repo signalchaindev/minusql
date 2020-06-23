@@ -21,7 +21,7 @@ main {
   font-family: sans-serif;
   margin: 0 auto;
   max-width: 800px;
-  padding: 80px 60px;
+  padding: 80px 16px;
 }
 
 h1 {
@@ -49,4 +49,8 @@ input {
 
 button {
   cursor: pointer;
+}
+
+a {
+  color: inherit;
 }
