@@ -1,4 +1,4 @@
-import todos from '../cache/todos.js'
+import todos from '../database/todos.js'
 
 export default function products() {
   const entries = []

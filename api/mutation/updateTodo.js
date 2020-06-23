@@ -1,4 +1,4 @@
-import todos from '../cache/todos.js'
+import todos from '../database/todos.js'
 import getTodoById from '../query/getTodoById.js'
 
 export default function updateTodo(_, args) {

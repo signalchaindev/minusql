@@ -1,5 +1,5 @@
-import todos from '../cache/todos.js'
-import generateId from '../cache/generateId.js'
+import todos from '../database/todos.js'
+import generateId from '../database/utils/generateId.js'
 
 export default function createTodo(_, args) {
   const { todo, completed } = args.input

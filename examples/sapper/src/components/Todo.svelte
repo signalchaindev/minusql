@@ -1,5 +1,5 @@
 <script>
-  import { client, gql } from './graphql.js'
+  import { client, gql } from '../graphql.js'
 
   export let todo
 
@@ -31,13 +31,13 @@
   }
 </script>
 
-<li id="{todo.id}">
+<li id={todo.id}>
   <label for="todo_{todo.id}">
     <input
       id="todo_{todo.id}"
-      on:change="{updateTodo}"
+      on:change={updateTodo}
       type="checkbox"
-      checked="{todo.completed}"
+      checked={todo.completed}
     />
     <span>{todo.todo}</span>
   </label>

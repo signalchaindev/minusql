@@ -1,9 +1,9 @@
 <script>
   import { onMount } from 'svelte'
-  import InputForm from './InputForm.svelte'
-  import Todo from './Todo.svelte'
-  import Loading from './Loading.svelte'
-  import { client, gql } from './graphql.js'
+  import InputForm from '../components/InputForm.svelte'
+  import Todo from '../components/Todo.svelte'
+  import Loading from '../components/Loading.svelte'
+  import { client, gql } from '../graphql.js'
 
   let todos
   $: todos = todos
