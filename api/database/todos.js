@@ -1,13 +1,15 @@
+import generateId from './generateId.js'
+
 const todos = new Map()
 
 const seed = [
   {
-    id: '123456',
+    id: generateId(),
     todo: 'Learn some GraphQL',
     completed: false,
   },
   {
-    id: '654321',
+    id: generateId(),
     todo: 'Launch awesome app!',
     completed: false,
   },
