@@ -6,12 +6,13 @@ import typeDefs from './typeDefs'
 
 const app = express()
 const port = 3001
-const frontendUrl = 'http://localhost:5000'
+const sapperUrl = 'http://localhost:3000'
+const svelteUrl = 'http://localhost:5000'
 const gqlServerEndpoint = 'http://localhost:3001'
 const gqlServerPath = '__playground'
 
 const corsOptions = {
-  origin: [frontendUrl],
+  origin: [sapperUrl, svelteUrl],
   credentials: true,
   methods: 'GET,POST,PUT,PATCH,DELETE',
   preflightContinue: false,
@@ -35,7 +36,8 @@ graphQLServer.applyMiddleware({
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 const startMsg = `
 🚀 API ready:
-Frontend: ${frontendUrl}
+sapperUrl: ${sapperUrl}
+svelteUrl: ${svelteUrl}
 Playground: ${gqlServerEndpoint}/${gqlServerPath}`
 
 app.listen({ port }, err => {
