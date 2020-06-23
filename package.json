@@ -5,9 +5,10 @@
   "main": "src/index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "run-p api static svelte",
+    "dev": "run-p api static svelte sapper",
     "build": "rollup -c",
     "static": "pushd examples\\static && npm run dev",
+    "sapper": "pushd examples\\sapper && npm run dev",
     "svelte": "pushd examples\\svelte && rollup -c -w",
     "api": "pushd api && npm run dev"
   },
