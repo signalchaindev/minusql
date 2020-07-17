@@ -317,17 +317,17 @@ MinusQL.prototype.cache = async function cache(initializeCacheItemData) {
     return value
   }
 
-  if (refetchQuery) {
-    const refetchKey = JSON.stringify(refetchQuery)
-    cacheStore.delete(refetchKey)
+  // if (refetchQuery) {
+  //   const refetchKey = JSON.stringify(refetchQuery)
+  //   cacheStore.delete(refetchKey)
 
-    // Get the informations off the cache value to refetch the query
-    this.fetchHandler(options)
-    console.log('\nREFETCH QUERY:', cacheStore, '\n')
+  //   // Get the informations off the cache value to refetch the query
+  //   this.fetchHandler(options)
+  //   console.log('\nREFETCH QUERY:', cacheStore, '\n')
 
-    const cs = cacheStore.get(refetchKey)
-    console.log('cs:', cs)
-  }
+  //   const cs = cacheStore.get(refetchKey)
+  //   console.log('cs:', cs)
+  // }
 
   // if (updateItem) {
   //   const { data, ...keyData } = updateItem

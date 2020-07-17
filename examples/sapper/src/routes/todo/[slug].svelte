@@ -34,8 +34,6 @@
       console.error(error)
     }
 
-    console.log('getTodoById:', data && data.getTodoById)
-
     todo = data && data.getTodoById
   })
 </script>
