@@ -262,7 +262,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
  * @param {String} initializeCacheItemData.operationName
  * @param {String} initializeCacheItemData.operationType
  * @param {Object || String} initializeCacheItemData.variables
- * @param {String} initializeCacheItemData.refetchQuery
+ * @param {Object} initializeCacheItemData.refetchQuery
  * @param {Object} initializeCacheItemData.requestOptions
  * @param {Boolean} initializeCacheItemData.isQuery
  * @param {Boolean} initializeCacheItemData.isMutation
@@ -274,12 +274,9 @@ MinusQL.prototype.cache = async function cache(initializeCacheItemData) {
   const {
     operation,
     operationName,
-    operationType,
     variables,
     refetchQuery,
     requestOptions,
-    isQuery,
-    isMutation,
     data,
     updateItem,
     deleteItem,
@@ -318,14 +315,15 @@ MinusQL.prototype.cache = async function cache(initializeCacheItemData) {
   }
 
   // if (refetchQuery) {
-  //   const refetchKey = JSON.stringify(refetchQuery)
-  //   cacheStore.delete(refetchKey)
+  //   // const refetchKey = JSON.stringify(refetchQuery)
+  //   // console.log('refetchKey:', refetchKey)
+  //   // cacheStore.delete(cacheKey)
 
-  //   // Get the informations off the cache value to refetch the query
+  //   // // Get the informations off the cache value to refetch the query
   //   this.fetchHandler(options)
   //   console.log('\nREFETCH QUERY:', cacheStore, '\n')
 
-  //   const cs = cacheStore.get(refetchKey)
+  //   const cs = cacheStore.get(cacheKey)
   //   console.log('cs:', cs)
   // }
 
@@ -363,7 +361,7 @@ MinusQL.prototype.cache = async function cache(initializeCacheItemData) {
  * @param {String} initializeCacheItemData.operationName
  * @param {String} initializeCacheItemData.operationType
  * @param {Object || String} initializeCacheItemData.variables
- * @param {String} initializeCacheItemData.refetchQuery
+ * @param {Object} initializeCacheItemData.refetchQuery
  * @param {Object} initializeCacheItemData.requestOptions
  * @param {Boolean} initializeCacheItemData.isQuery
  * @param {Boolean} initializeCacheItemData.isMutation

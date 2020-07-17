@@ -5,17 +5,18 @@
   let value
   $: value = ''
 
-  async function createTodo() {
-    const CREATE_TODO_MUTATION = gql`
-      mutation CREATE_TODO_MUTATION($input: TodoInput!) {
-        createTodo(input: $input) {
-          id
-          todo
-          completed
-        }
+  const CREATE_TODO_MUTATION = gql`
+    mutation CREATE_TODO_MUTATION($input: TodoInput!) {
+      createTodo(input: $input) {
+        id
+        todo
+        completed
       }
-    `
-    const { data, error } = await client.mutation({
+    }
+  `
+
+  async function createTodo() {
+    const { error } = await client.mutation({
       mutation: CREATE_TODO_MUTATION,
       variables: {
         input: {
@@ -23,9 +24,8 @@
           completed: false,
         },
       },
-      refetchQuery: GET_ALL_TODOS_QUERY,
+      refetchQuery: { query: GET_ALL_TODOS_QUERY },
     })
-    console.log('data:', data)
 
     if (error) {
       console.error('error:', error)

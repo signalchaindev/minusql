@@ -23,7 +23,7 @@
           completed,
         },
       },
-      refetchQuery: GET_ALL_TODOS_QUERY,
+      refetchQuery: { query: GET_ALL_TODOS_QUERY },
     })
 
     if (error) {
