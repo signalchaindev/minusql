@@ -2,22 +2,13 @@
   import { onMount } from 'svelte'
   import Todo from '../components/Todo.svelte'
   import Loading from '../components/Loading.svelte'
-  import { client, gql } from '../graphql.js'
+  import { GET_ALL_TODOS_QUERY } from './getAllTodos.js'
+  import { client } from '../graphql.js'
 
   $: todos = todos
 
   onMount(async () => {
-    const GET_ALL_TODOS_QUERY = gql`
-      query GET_ALL_TODOS_QUERY {
-        getAllTodos {
-          id
-          todo
-          completed
-        }
-      }
-    `
-
-    const { getAllTodos, error } = await client.query({
+    const { data, error } = await client.query({
       query: GET_ALL_TODOS_QUERY,
     })
 
@@ -25,7 +16,7 @@
       console.error(error)
     }
 
-    todos = getAllTodos
+    todos = data.getAllTodos
   })
 </script>
 

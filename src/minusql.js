@@ -1,6 +1,8 @@
 import aggregateOptions from './utils/aggregate-options.js'
 // TODO: fix SSR
-// import fetch from './utils/iso-fetch.js'
+import fetch from './utils/iso-fetch.js'
+import generateCacheKey from './utils/generate-cache-key.js'
+import gqlParser from './utils/gql-string-parser.js'
 import safeJsonParse from './utils/safe-json-parse.js'
 import validateResolver from './utils/validate-resolver.js'
 
@@ -15,7 +17,7 @@ const cacheStore = new Map()
  * @param {Object!} options
  * @param {String!} options.uri - the server address of the GraphQL endpoint
  * @param {Object} options.headers - request headers
- * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
+ * @param {Object} options.requestOptions - addition options to fetch request (refer to fetch api)
  * @param {Boolean} options.verbose - log errors to console
  *
  * @return {Object} GraphQL client
@@ -59,6 +61,8 @@ MinusQL.prototype.query = function query({
 }) {
   const hasOperation = !!query
   validateResolver('query', hasOperation, rest)
+  // If there is no operation, validateResolver handles throwing the error
+  // Then we bail because we need the operation to successfully run this function
   if (!hasOperation) return
 
   const options = aggregateOptions({
@@ -102,6 +106,8 @@ MinusQL.prototype.mutation = function mutation({
 }) {
   const hasOperation = !!mutation
   validateResolver('mutation', hasOperation, rest)
+  // If there is no operation, validateResolver handles throwing the error
+  // Then we bail because we need the operation to successfully run this function
   if (!hasOperation) return
 
   const options = aggregateOptions({
@@ -147,8 +153,8 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
   updateItem,
   deleteItem,
 }) {
-  const [operationType, name] = operation && operation.split(' ')
-  const [operationName] = name && name.split('(')
+  // TODO: Write better parser
+  const [operationType, operationName] = gqlParser(operation)
 
   const isQuery = operationType === 'query'
   const isMutation = operationType === 'mutation'
@@ -245,46 +251,40 @@ MinusQL.prototype.fetchHandler = async function fetchHandler({
     await this.cache(initializeCacheItemData)
   }
 
-  return { ...data.data, error: res.ok && null }
-}
-
-function generateCacheKey({
-  operation,
-  operationName,
-  variables,
-  refetchQuery,
-  updateItem,
-  deleteItem,
-}) {
-  if (operation && !updateItem && !deleteItem) {
-    return JSON.stringify({
-      query: refetchQuery ? refetchQuery.query : operationName,
-      variables: refetchQuery ? refetchQuery.variables : variables,
-    })
-  }
+  return { ...data, error: res.ok && null }
 }
 
 /**
  * Cache handler method
  *
- * @param {Object!} options
- * @param {String} options.refetchQuery
- * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
- * TODO: write types
+ * @param {Object!} initializeCacheItemData
+ * @param {String} initializeCacheItemData.operation
+ * @param {String} initializeCacheItemData.operationName
+ * @param {String} initializeCacheItemData.operationType
+ * @param {Object || String} initializeCacheItemData.variables
+ * @param {String} initializeCacheItemData.refetchQuery
+ * @param {Object} initializeCacheItemData.requestOptions
+ * @param {Boolean} initializeCacheItemData.isQuery
+ * @param {Boolean} initializeCacheItemData.isMutation
+ * @param {Object} initializeCacheItemData.data
+ * @param {} initializeCacheItemData.updateItem
+ * @param {} initializeCacheItemData.deleteItem
  */
-MinusQL.prototype.cache = async function cache({
-  operation,
-  operationName,
-  operationType,
-  variables,
-  refetchQuery,
-  requestOptions,
-  isQuery,
-  isMutation,
-  data,
-  updateItem,
-  deleteItem,
-}) {
+MinusQL.prototype.cache = async function cache(initializeCacheItemData) {
+  const {
+    operation,
+    operationName,
+    operationType,
+    variables,
+    refetchQuery,
+    requestOptions,
+    isQuery,
+    isMutation,
+    data,
+    updateItem,
+    deleteItem,
+  } = initializeCacheItemData
+
   let cacheKey = generateCacheKey({
     operation,
     operationName,
@@ -318,110 +318,74 @@ MinusQL.prototype.cache = async function cache({
   }
 
   if (refetchQuery) {
-    // USAGE: Sign out user is a bad example. That's more of an update or delete cache key situation, but this is the syntax.
-
-    // await client.mutation({
-    //   mutation: SIGN_OUT_USER_MUTATION,
-    //   refetchQuery: {
-    //     query: 'CURRENT_USER_QUERY',
-    //     variables: {
-    //       authToken: user.authToken,
-    //     },
-    //   },
-    // })
     const refetchKey = JSON.stringify(refetchQuery)
-    console.log('refetchKey:', refetchKey)
-
-    const cs = cacheStore.get(refetchKey)
-    console.log('cs:', cs)
     cacheStore.delete(refetchKey)
 
     // Get the informations off the cache value to refetch the query
     this.fetchHandler(options)
     console.log('\nREFETCH QUERY:', cacheStore, '\n')
-    return
+
+    const cs = cacheStore.get(refetchKey)
+    console.log('cs:', cs)
   }
 
-  if (updateItem) {
-    const { data, ...keyData } = updateItem
-    const updateKey = JSON.stringify(keyData)
-    const currentVal = cacheStore.get(updateKey)
-    const options = currentVal && currentVal.options
+  // if (updateItem) {
+  //   const { data, ...keyData } = updateItem
+  //   const updateKey = JSON.stringify(keyData)
+  //   const currentVal = cacheStore.get(updateKey)
+  //   const options = currentVal && currentVal.options
 
-    cacheStore.set(updateKey, { data, options })
+  //   cacheStore.set(updateKey, { data, options })
 
-    console.log('\nUPDATE CACHE:', cacheStore, '\n')
-    return cacheStore
-  }
+  //   console.log('\nUPDATE CACHE:', cacheStore, '\n')
+  //   return cacheStore
+  // }
 
-  if (deleteItem) {
-    const key = JSON.stringify(deleteItem)
-    const has = cacheStore.has(key)
+  // if (deleteItem) {
+  //   const key = JSON.stringify(deleteItem)
+  //   const has = cacheStore.has(key)
 
-    if (has) {
-      cacheStore.delete(key)
-    }
+  //   if (has) {
+  //     cacheStore.delete(key)
+  //   }
 
-    console.log('\nUPDATE CACHE:', cacheStore, '\n')
-    return cacheStore
-  }
-
-  if (cacheStore.size > 0) {
-    console.log('\nRETURN CACHE:', cacheStore, '\n')
-    return cacheStore
-  }
+  //   console.log('\nUPDATE CACHE:', cacheStore, '\n')
+  //   return cacheStore
+  // }
 }
 
 /**
- * Pre-Cache handler method
+ * Pre-Fetch handler method - Handles caching policies
  *
  * @private
- * @param {Object!} options
- * @param {String} options.refetchQuery
- * @param {Object} options.requestOptions - addition options to fetch request(refer to fetch api)
- * TODO: write types
+ * @param {Object!} initializeCacheItemData
+ * @param {String} initializeCacheItemData.operation
+ * @param {String} initializeCacheItemData.operationName
+ * @param {String} initializeCacheItemData.operationType
+ * @param {Object || String} initializeCacheItemData.variables
+ * @param {String} initializeCacheItemData.refetchQuery
+ * @param {Object} initializeCacheItemData.requestOptions
+ * @param {Boolean} initializeCacheItemData.isQuery
+ * @param {Boolean} initializeCacheItemData.isMutation
+ * @param {Object} initializeCacheItemData.data
+ * @param {} initializeCacheItemData.updateItem
+ * @param {} initializeCacheItemData.deleteItem
  */
-MinusQL.prototype.preFetchHandler = async function preFetchHandler({
-  operation,
-  operationName,
-  operationType,
-  variables,
-  refetchQuery,
-  requestOptions,
-  isMutation,
-  updateItem,
-  deleteItem,
-}) {
-  const initializeCacheItemData = {
-    operation,
-    operationName,
-    operationType,
-    variables,
-    requestOptions,
-    refetchQuery,
-    updateItem,
-    deleteItem,
-  }
+MinusQL.prototype.preFetchHandler = async function preFetchHandler(initializeCacheItemData) {
+  const { isMutation, refetchQuery } = initializeCacheItemData
 
-  // TODO: I feel like we need to check for duplicate cache keys, but haven't been able to produce a test case yet
+  let cacheData
   let cacheKey = generateCacheKey(initializeCacheItemData)
   const keyIsCached = cacheStore.has(cacheKey)
+
+  // If there is data in the cache, get it
   if (keyIsCached) {
-    const inCacheData = cacheStore.get(cacheKey)
-    console.log('inCacheData:', inCacheData)
-    console.warn(
-      `${
-        cacheKey.split(':')[1]
-      } has been already declared. This may result in unexpected behavior.`,
-    )
+    cacheData = cacheStore.get(cacheKey)
   }
 
   if (isMutation && refetchQuery) {
-    await this.cache({ refetchQuery })
-    return null
+    cacheData = await this.cache(initializeCacheItemData)
   }
-
-  const cacheData = await this.cache(initializeCacheItemData)
 
   // If there is data in the cache, return it
   if (cacheData) {

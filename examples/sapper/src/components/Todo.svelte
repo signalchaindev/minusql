@@ -1,6 +1,5 @@
 <script>
   import { client, gql } from '../graphql.js'
-  import slugify from 'slugify'
 
   export let todo
 
@@ -43,7 +42,7 @@
     <span>{todo.todo}</span>
   </label>
   &nbsp
-  <a href={slugify(todo.todo).toLowerCase()}>notes</a>
+  <a href={`todo/${todo.id}`} rel="prefetch">notes</a>
 </li>
 
 <style>

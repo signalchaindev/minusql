@@ -1,8 +1,9 @@
 <script>
   import { client, gql } from '../graphql.js'
+  import { GET_ALL_TODOS_QUERY } from './getAllTodos.js'
 
+  let value
   $: value = ''
-  $: console.log('value:', value)
 
   async function createTodo() {
     const CREATE_TODO_MUTATION = gql`
@@ -14,7 +15,7 @@
         }
       }
     `
-    const { createTodo, error } = await client.mutation({
+    const { data, error } = await client.mutation({
       mutation: CREATE_TODO_MUTATION,
       variables: {
         input: {
@@ -22,8 +23,9 @@
           completed: false,
         },
       },
+      refetchQuery: GET_ALL_TODOS_QUERY,
     })
-    console.log('createTodo:', createTodo)
+    console.log('data:', data)
 
     if (error) {
       console.error('error:', error)
