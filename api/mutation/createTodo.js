@@ -10,6 +10,7 @@ export default function createTodo(_, args) {
     id,
     todo,
     completed,
+    notes: ''
   }
 
   todos.set(id, newTodo)

@@ -13,9 +13,11 @@ type Todo {
   id: ID!
   todo: String!
   completed: Boolean!
+  notes: String
 }
 
 input TodoInput {
   todo: String
   completed: Boolean
+  notes: String
 }
