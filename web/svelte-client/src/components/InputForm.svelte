@@ -13,8 +13,7 @@
         }
       }
     `
-    const { createTodo, error } = await client.mutation({
-      mutation: CREATE_TODO_MUTATION,
+    const [createTodo, error] = await client.mutation(CREATE_TODO_MUTATION, {
       variables: {
         input: {
           todo: value,

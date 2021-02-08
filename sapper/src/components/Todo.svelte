@@ -14,8 +14,7 @@
   async function updateTodo() {
     completed = !completed;
 
-    const { data, error } = await client.mutation({
-      mutation: UPDATE_TODO_MUTATION,
+    const { data, error } = await client.mutation(UPDATE_TODO_MUTATION, {
       variables: {
         id: todo.id,
         todo: {

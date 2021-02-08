@@ -15,6 +15,10 @@ html {
   margin-inline-end: 0px;
 }
 
+body {
+  font-family: sans-serif;
+}
+
 main {
   background: #000031;
   color: #fff;

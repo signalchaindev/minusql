@@ -1,13 +1,13 @@
 <script>
-  import { onMount } from 'svelte'
-  import { client, gql } from '../graphql.js'
-  import { GET_ALL_TODOS_QUERY } from './getAllTodos.js'
+  import { onMount } from "svelte";
+  import { client, gql } from "../graphql.js";
+  import { GET_ALL_TODOS_QUERY } from "./getAllTodos.js";
 
-  export let id
+  export let id;
 
-  let editMode = false
-  let todo
-  $: todo = todo
+  let editMode = false;
+  let todo;
+  $: todo = todo;
 
   onMount(async () => {
     const GET_TODO_BY_ID = gql`
@@ -19,30 +19,28 @@
           notes
         }
       }
-    `
-    const { data, error } = await client.query({
-      query: GET_TODO_BY_ID,
+    `;
+    const { data, error } = await client.query(GET_TODO_BY_ID, {
       variables: { id },
-    })
+    });
 
     if (error) {
-      console.error(error)
+      console.error(error);
     }
 
-    todo = data && data.getTodoById
-  })
+    todo = data && data.getTodoById;
+  });
 
   const UPDATE_TODO_MUTATION = gql`
     mutation UPDATE_TODO_MUTATION($id: ID!, $todo: TodoInput!) {
       updateTodo(id: $id, todo: $todo)
     }
-  `
+  `;
 
   async function updateTodo() {
-    editMode = false
+    editMode = false;
 
-    const { data, error } = await client.mutation({
-      mutation: UPDATE_TODO_MUTATION,
+    const [data, error] = await client.mutation(UPDATE_TODO_MUTATION, {
       variables: {
         id: todo.id,
         todo: {
@@ -52,13 +50,13 @@
         },
       },
       refetchQuery: { query: GET_ALL_TODOS_QUERY },
-    })
+    });
 
     if (error) {
-      console.error(error)
+      console.error(error);
     }
 
-    console.log(data && data.updateTodo)
+    console.log(data && data.updateTodo);
   }
 </script>
 

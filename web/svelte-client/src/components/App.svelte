@@ -20,9 +20,7 @@
       }
     `
 
-    const { getAllTodos, error } = await client.query({
-      query: GET_ALL_TODOS_QUERY,
-    })
+    const [getAllTodos, error] = await client.query(GET_ALL_TODOS_QUERY)
 
     if (error) {
       console.error(error)

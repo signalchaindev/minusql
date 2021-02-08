@@ -14,9 +14,7 @@
   });
 
   async function fetchTodos() {
-    const [data, error] = await client.query({
-      query: GET_ALL_TODOS_QUERY,
-    });
+    const [data, error] = await client.query(GET_ALL_TODOS_QUERY);
     if (error !== null) {
       console.error(error.name);
       console.error(error.message);

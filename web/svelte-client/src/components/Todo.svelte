@@ -10,8 +10,7 @@
       }
     `
 
-    const { updateTodo, error } = await client.mutation({
-      mutation: UPDATE_TODO_MUTATION,
+    const [updateTodo, error] = await client.mutation(UPDATE_TODO_MUTATION, {
       variables: {
         id: todo.id,
         todo: {
@@ -48,11 +47,12 @@
     display: flex;
     align-items: center;
     line-height: 0px;
+    margin-bottom: 8px;
   }
 
-  /* li + li {
-    margin-top: 8px;
-  } */
+  li:last-of-type {
+    margin-bottom: 0px;
+  }
 
   label {
     display: block;

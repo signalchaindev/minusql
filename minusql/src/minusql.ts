@@ -62,34 +62,21 @@ export function MinusQL(
 /**
  * Query method
  */
+type Operation = string // gql query string
 interface QueryInput {
-  query: string // gql query string
-  variables: Object
+  variables?: Object
   headers?: RequestHeaders // additional headers (refer to fetch api)
   requestOptions?: Object // additional options to fetch request (refer to fetch api)
-  [key: string]: any
 }
 
-MinusQL.prototype.query = function query({
-  query,
-  variables,
-  headers,
-  requestOptions,
-  ...rest
-}: QueryInput): Promise<MinusQLReturn> | MinusQLReturn {
+MinusQL.prototype.query = function query(
+  operation: Operation,
+  options: QueryInput,
+): Promise<MinusQLReturn> | MinusQLReturn {
   try {
-    return this.aggregateResolvers(
-      'query',
-      {
-        operation: query,
-        variables,
-        headers,
-        requestOptions,
-      },
-      rest,
-    )
+    return this.aggregateResolvers(operation, options)
   } catch (err) {
-    return [null, { name: '#236754348', message: err }]
+    return [null, { name: 'MinusQL error #236754348', message: `${err}` }]
   }
 }
 
@@ -97,36 +84,22 @@ MinusQL.prototype.query = function query({
  * Mutation method
  */
 interface MutationInput {
-  mutation: string // gql query string
   variables: Object
   headers?: RequestHeaders // additional headers (refer to fetch api)
   requestOptions?: Object // additional options to fetch request (refer to fetch api)
-  [key: string]: any
 }
 
-MinusQL.prototype.mutation = function mutation({
-  mutation,
-  variables,
-  headers,
-  requestOptions,
-  // refetchQuery,
+MinusQL.prototype.mutation = function mutation(
+  operation: Operation,
+  options: // refetchQuery,
   // updateItem,
   // deleteItem,
-  ...rest
-}: MutationInput): Promise<MinusQLReturn> | MinusQLReturn {
+  MutationInput,
+): Promise<MinusQLReturn> | MinusQLReturn {
   try {
-    return this.aggregateResolvers(
-      'mutation',
-      {
-        operation: mutation,
-        variables,
-        headers,
-        requestOptions,
-      },
-      rest,
-    )
+    return this.aggregateResolvers(operation, options)
   } catch (err) {
-    return [null, { name: '#434823675', message: err }]
+    return [null, { name: 'MinusQL error #434823675', message: `${err}` }]
   }
 }
 
@@ -134,37 +107,16 @@ MinusQL.prototype.mutation = function mutation({
  * Aggregate Resolvers method
  */
 interface AggregateResolveOptions {
-  operation: string
   variables
   headers
   requestOptions
 }
 
 MinusQL.prototype.aggregateResolvers = async function aggregateResolvers(
-  operationType: string,
+  operation: Operation,
   options: AggregateResolveOptions,
-  rest: { [key: string]: string } = {},
 ): Promise<MinusQLReturn> {
   try {
-    if (options && !options.operation) {
-      return [
-        null,
-        {
-          name: '#736592202',
-          message: `${operationType} method requires a '${operationType}' operation as a GQL string`,
-        },
-      ]
-    }
-    if (Object.keys(rest).length !== 0) {
-      return [
-        null,
-        {
-          name: '#3425822457',
-          message: `${Object.keys(rest)[0]} is not a valid option`,
-        },
-      ]
-    }
-
     if (options && options.headers) {
       this.headers = { ...this.headers, headers: options.headers }
     }
@@ -175,16 +127,16 @@ MinusQL.prototype.aggregateResolvers = async function aggregateResolvers(
       }
     }
 
-    const [data, error] = await this.fetchHandler({
-      operation: options.operation,
-      variables: options.variables,
-    })
+    const [data, error] = await this.fetchHandler(
+      operation,
+      options && options.variables,
+    )
     if (error !== null) {
       return [null, error]
     }
     return [data, null]
   } catch (err) {
-    return [null, { name: '#7538289028', message: err }]
+    return [null, { name: 'MinusQL error #7538289028', message: `${err}` }]
   }
 }
 
@@ -199,13 +151,13 @@ interface FetchHandlerInput {
   // deleteItem?: Object
 }
 
-MinusQL.prototype.fetchHandler = async function fetchHandler({
+MinusQL.prototype.fetchHandler = async function fetchHandler(
   operation,
-  variables,
-}: // refetchQuery,
-// updateItem,
-// deleteItem,
-FetchHandlerInput): Promise<MinusQLReturn> {
+  variables: // refetchQuery,
+  // updateItem,
+  // deleteItem,
+  FetchHandlerInput,
+): Promise<MinusQLReturn> {
   try {
     // // TODO: Write better parser
     // const [operationType, operationName] = gqlParser(operation)
@@ -236,6 +188,10 @@ FetchHandlerInput): Promise<MinusQLReturn> {
     //   }
     // }
 
+    const body: { query: string; variables?: Object } = {
+      query: operation,
+    }
+    if (variables) body.variables = variables
     const requestObject: RequestObject = {
       method: 'POST',
       headers: {
@@ -243,10 +199,7 @@ FetchHandlerInput): Promise<MinusQLReturn> {
         'Content-Type': 'application/json',
         ...this.headers,
       },
-      body: JSON.stringify({
-        query: operation,
-        variables,
-      }),
+      body: JSON.stringify(body),
       credentials: this.credentials || 'include',
       ...this.requestOptions,
     }
@@ -275,7 +228,7 @@ FetchHandlerInput): Promise<MinusQLReturn> {
 
     return [resJson.data, null]
   } catch (err) {
-    return [null, { name: '#78464281', message: err }]
+    return [null, { name: 'MinusQL error #78464281', message: `${err}` }]
   }
 }
 

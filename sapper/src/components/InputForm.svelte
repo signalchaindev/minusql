@@ -16,8 +16,7 @@
   `;
 
   async function createTodo() {
-    const { error } = await client.mutation({
-      mutation: CREATE_TODO_MUTATION,
+    const [data, error] = await client.mutation(CREATE_TODO_MUTATION, {
       variables: {
         input: {
           todo: value,
@@ -32,6 +31,8 @@
       console.error(error.message);
       return;
     }
+
+    console.log(data);
 
     value = "";
   }
