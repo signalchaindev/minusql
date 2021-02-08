@@ -1,0 +1,20 @@
+{
+  "name": "minusql-example-api",
+  "version": "0.1.0",
+  "description": "Example API for MinusQL examples",
+  "main": "server.js",
+  "author": "James gleason",
+  "scripts": {
+    "dev": "nodemon -r esm -e js,graphql server.js"
+  },
+  "dependencies": {
+    "apollo-server-express": "2.13.0",
+    "cors": "2.8.5",
+    "esm": "3.2.25",
+    "express": "4.17.1",
+    "graphql": "14.6.0",
+    "graphql-toolkit": "0.7.5",
+    "node-fetch": "2.6.0",
+    "nodemon": "2.0.3"
+  }
+}

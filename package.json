@@ -1,37 +1,18 @@
 {
-  "name": "minusql",
-  "version": "0.1.0",
-  "description": "",
-  "main": "src/index.js",
-  "license": "MIT",
+  "name": "minusql-suite",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@scdgh:signalchaindev/minusql.git"
+  },
   "scripts": {
-    "dev": "run-p api static svelte sapper",
-    "build": "rollup -c",
-    "static": "pushd examples\\static && npm run dev",
-    "sapper": "pushd examples\\sapper && npm run dev",
-    "svelte": "pushd examples\\svelte && rollup -c -w",
-    "api": "pushd api && npm run dev"
-  },
-  "dependencies": {
-    "esm": "3.2.25",
-    "graphql": "14.6.0",
-    "node-fetch": "2.6.0",
-    "npm-run-all": "4.1.5",
-    "rollup-plugin-terser": "5.3.0",
-    "svelte": "3.22.2"
-  },
-  "devDependencies": {
-    "eslint": "6.8.0",
-    "eslint-config-standard": "14.1.1",
-    "eslint-plugin-cypress": "2.10.3",
-    "eslint-plugin-graphql": "3.1.1",
-    "eslint-plugin-import": "2.20.2",
-    "eslint-plugin-json": "2.1.1",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "4.2.1",
-    "eslint-plugin-standard": "4.0.1",
-    "eslint-plugin-svelte3": "2.7.3",
-    "prettier": "2.0.5",
-    "rollup": "2.8.2"
+    "//dev": "run-p api static svelte sapper",
+    "dev": "run-p api svelte",
+    "//static": "pushd examples\\static && npm run dev",
+    "//sapper": "pushd examples\\sapper && npm run dev",
+    "svelte": "pushd web && npm run dev",
+    "api": "pushd api && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

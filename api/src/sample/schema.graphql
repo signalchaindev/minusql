@@ -1,0 +1,8 @@
+type Mutation {
+  sampleMutation: String
+}
+
+type Query {
+  sampleQuery: String
+  sampleTSQuery: String
+}
