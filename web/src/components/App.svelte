@@ -3,12 +3,12 @@
   import InputForm from './InputForm.svelte'
   import Todo from './Todo.svelte'
   import Loading from './Loading.svelte'
-  import { client, gql } from './graphql.js'
+  import { client, gql } from '../graphql.js'
 
   let todos
   $: todos = todos
 
-  onMount(async () => {
+  onMount(async function () {
     const GET_ALL_TODOS_QUERY = gql`
       query GET_ALL_TODOS_QUERY {
         getAllTodos {

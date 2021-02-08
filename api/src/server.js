@@ -1,7 +1,7 @@
 import path from 'path'
 import { ApolloServer } from 'apollo-server-express'
 import express from 'express'
-import mongoose from 'mongoose'
+// import mongoose from 'mongoose'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import scalars from './scalars.js'
@@ -11,15 +11,15 @@ import { typeDefs } from '@tempo/typeDefs.js'
 const envPath = path.join(process.cwd(), '.env')
 dotenv.config({ path: envPath })
 
-const dbUri = process.env.DATABASE_URI
-mongoose
-  .connect(dbUri, {
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  })
-  .then(() => console.log('[database] connected'))
-  .catch(err => console.error(`\n\nMongoose Error: \n${err}\n\n`))
+// const dbUri = process.env.DATABASE_URI
+// mongoose
+//   .connect(dbUri, {
+//     useCreateIndex: true,
+//     useUnifiedTopology: true,
+//     useNewUrlParser: true,
+//   })
+//   .then(() => console.log('[database] connected'))
+//   .catch(err => console.error(`\n\nMongoose Error: \n${err}\n\n`))
 
 const app = express()
 const dev = process.env.NODE_ENV === 'development'

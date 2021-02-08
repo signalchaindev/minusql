@@ -1,5 +1,5 @@
-import todos from '../database/todos.js'
-import generateId from '../database/utils/generateId.js'
+import todos from '../../../database/todos.js'
+import generateId from '../../../database/utils/generateId.js'
 
 export default function createTodo(_, args) {
   const { todo, completed } = args.input
@@ -10,7 +10,7 @@ export default function createTodo(_, args) {
     id,
     todo,
     completed,
-    notes: ''
+    notes: '',
   }
 
   todos.set(id, newTodo)

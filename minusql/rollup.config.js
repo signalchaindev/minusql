@@ -5,7 +5,7 @@ import pkg from "./package.json";
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-  input: "./src/minusql.js",
+  input: "./main.js",
   output: [
     { file: pkg.main, format: "cjs", sourcemap: true, exports: "named" },
     { file: pkg.module, format: "es", sourcemap: true, exports: "named" },

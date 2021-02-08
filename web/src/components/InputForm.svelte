@@ -1,5 +1,5 @@
 <script>
-  import { client, gql } from './graphql.js'
+  import { client, gql } from '../graphql.js'
 
   let value = ''
 

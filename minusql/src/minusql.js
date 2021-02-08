@@ -22,7 +22,7 @@ const cacheStore = new Map();
  *
  * @return {Object} GraphQL client
  */
-export default function MinusQL({
+export function MinusQL({
   uri,
   credentials,
   headers,
