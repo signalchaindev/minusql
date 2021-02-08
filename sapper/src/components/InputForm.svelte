@@ -1,9 +1,9 @@
 <script>
-  import { client, gql } from '../graphql.js'
-  import { GET_ALL_TODOS_QUERY } from './getAllTodos.js'
+  import { client, gql } from "../graphql.js";
+  import { GET_ALL_TODOS_QUERY } from "./getAllTodos.js";
 
-  let value
-  $: value = ''
+  let value;
+  $: value = "";
 
   const CREATE_TODO_MUTATION = gql`
     mutation CREATE_TODO_MUTATION($input: TodoInput!) {
@@ -13,7 +13,7 @@
         completed
       }
     }
-  `
+  `;
 
   async function createTodo() {
     const { error } = await client.mutation({
@@ -25,13 +25,15 @@
         },
       },
       refetchQuery: { query: GET_ALL_TODOS_QUERY },
-    })
+    });
 
     if (error) {
-      console.error('error:', error)
+      console.error(error.name);
+      console.error(error.message);
+      return;
     }
 
-    value = ''
+    value = "";
   }
 </script>
 
@@ -41,7 +43,7 @@
     <input
       id="todo-input"
       type="text"
-      on:keyup={e => (value = e.target.value)}
+      on:keyup={(e) => (value = e.target.value)}
       {value}
     />
   </label>

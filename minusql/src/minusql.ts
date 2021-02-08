@@ -70,13 +70,13 @@ interface QueryInput {
   [key: string]: any
 }
 
-MinusQL.prototype.query = async function query({
+MinusQL.prototype.query = function query({
   query,
   variables,
   headers,
   requestOptions,
   ...rest
-}: QueryInput): Promise<MinusQLReturn> {
+}: QueryInput): Promise<MinusQLReturn> | MinusQLReturn {
   try {
     return this.aggregateResolvers(
       'query',
@@ -104,7 +104,7 @@ interface MutationInput {
   [key: string]: any
 }
 
-MinusQL.prototype.mutation = async function mutation({
+MinusQL.prototype.mutation = function mutation({
   mutation,
   variables,
   headers,
@@ -113,7 +113,7 @@ MinusQL.prototype.mutation = async function mutation({
   // updateItem,
   // deleteItem,
   ...rest
-}: MutationInput): Promise<MinusQLReturn> {
+}: MutationInput): Promise<MinusQLReturn> | MinusQLReturn {
   try {
     return this.aggregateResolvers(
       'mutation',

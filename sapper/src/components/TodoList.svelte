@@ -23,17 +23,14 @@
       return;
     }
 
-    // console.log("data:", data);
     todos = data && data.getAllTodos;
-    if (todos && todos.length > 0) {
-      loading = false;
-    }
+    loading = false;
   }
 </script>
 
 {#if loading}
   <Loading />
-{:else if todos}
+{:else}
   <ul>
     {#each todos as todo}
       <Todo {todo} />
