@@ -1,2 +1,2 @@
-export * from "./src/minusql.js";
-export * from "./src/gql.js";
+export * from './src/minusql' // .ts
+export * from './src/gql.js'

@@ -1,4 +1,4 @@
-import { gql } from '../graphql.js'
+import { gql } from "../graphql.js";
 
 export const GET_ALL_TODOS_QUERY = gql`
   query GET_ALL_TODOS_QUERY {
@@ -8,4 +8,4 @@ export const GET_ALL_TODOS_QUERY = gql`
       completed
     }
   }
-`
+`;

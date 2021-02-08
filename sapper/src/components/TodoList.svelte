@@ -1,33 +1,43 @@
 <script>
-  import { onMount } from 'svelte'
-  import Todo from '../components/Todo.svelte'
-  import Loading from '../components/Loading.svelte'
-  import { GET_ALL_TODOS_QUERY } from './getAllTodos.js'
-  import { client } from '../graphql.js'
+  import { onMount } from "svelte";
+  import Todo from "../components/Todo.svelte";
+  import Loading from "../components/Loading.svelte";
+  import { GET_ALL_TODOS_QUERY } from "./getAllTodos.js";
+  import { client } from "../graphql.js";
 
-  $: todos = todos
+  let loading = true;
+  let todos = [];
+  $: todos = todos;
 
-  onMount(async () => {
-    const { data, error } = await client.query({
+  onMount(() => {
+    fetchTodos();
+  });
+
+  async function fetchTodos() {
+    const [data, error] = await client.query({
       query: GET_ALL_TODOS_QUERY,
-    })
-
-    if (error) {
-      console.error(error)
+    });
+    if (error !== null) {
+      console.error(error);
+      return;
     }
 
-    todos = data.getAllTodos
-  })
+    // console.log("data:", data);
+    todos = data && data.getAllTodos;
+    if (todos && todos.length > 0) {
+      loading = false;
+    }
+  }
 </script>
 
-{#if todos}
+{#if loading}
+  <Loading />
+{:else if todos}
   <ul>
     {#each todos as todo}
       <Todo {todo} />
     {/each}
   </ul>
-{:else}
-  <Loading />
 {/if}
 
 <style>

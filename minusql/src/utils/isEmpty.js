@@ -1,4 +1,5 @@
 const isEmpty = value =>
+  value === false ||
   value === undefined ||
   value === null ||
   (value.constructor === Array && value.length === 0) ||

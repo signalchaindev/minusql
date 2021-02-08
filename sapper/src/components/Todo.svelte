@@ -53,11 +53,12 @@
     display: flex;
     align-items: center;
     line-height: 0px;
+    margin-bottom: 16px;
   }
 
-  /* li + li {
-    margin-top: 8px;
-  } */
+  li:last-of-type {
+    margin-bottom: 0px;
+  }
 
   label {
     display: block;

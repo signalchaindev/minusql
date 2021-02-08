@@ -4,6 +4,12 @@ const todos = new Map()
 
 const seed = [
   {
+    id: '1',
+    todo: 'Test fetch by ID',
+    completed: true,
+    description: '',
+  },
+  {
     id: generateId(),
     todo: 'Learn some GraphQL',
     completed: false,
