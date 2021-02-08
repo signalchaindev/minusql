@@ -18,7 +18,8 @@
       query: GET_ALL_TODOS_QUERY,
     });
     if (error !== null) {
-      console.error(error);
+      console.error(error.name);
+      console.error(error.message);
       return;
     }
 

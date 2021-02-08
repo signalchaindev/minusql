@@ -1,14 +1,7 @@
-// import isEmpty from './utils/isEmpty.js'
 import fetch from './utils/isoFetch.js'
 // import generateCacheKey from './utils/generate-cache-key.js'
-import gqlParser from './utils/gql-string-parser.js'
+// import gqlParser from './utils/gql-string-parser.js'
 // import safeJsonParse from './utils/safe-json-parse.js'
-import validateResolver from './utils/validateResolver.js'
-
-/**
- * The cache
- */
-// const cacheStore = new Map()
 
 type RequestMethod = 'POST'
 
@@ -49,6 +42,11 @@ interface MinusQLInput {
 type MinusQLReturn = [Object | null, Error | null]
 
 /**
+ * The cache
+ */
+// const cacheStore = new Map()
+
+/**
  * Create a MinusQL instance
  */
 export function MinusQL(
@@ -61,6 +59,9 @@ export function MinusQL(
   this.credentials = credentials
 }
 
+/**
+ * Query method
+ */
 interface QueryInput {
   query: string // gql query string
   variables: Object
@@ -69,9 +70,6 @@ interface QueryInput {
   [key: string]: any
 }
 
-/**
- * Query method
- */
 MinusQL.prototype.query = async function query({
   query,
   variables,
@@ -80,84 +78,119 @@ MinusQL.prototype.query = async function query({
   ...rest
 }: QueryInput): Promise<MinusQLReturn> {
   try {
-    const err = validateResolver('query', !!query, rest)
-    if (err !== null) {
-      return [null, err]
-    }
-
-    if (headers) {
-      this.headers = { ...this.headers, headers }
-    }
-    if (requestOptions) {
-      this.requestOptions = { ...this.requestOptions, requestOptions }
-    }
-
-    const [data, error] = await this.fetchHandler({
-      operation: query,
-      variables,
-    })
-
-    if (error !== null) {
-      return [null, error]
-    }
-    if (data === null) {
-      return [null, { name: '#34785642839', message: 'no data my friend' }]
-    }
-
-    return [data, null]
+    return this.aggregateResolvers(
+      'query',
+      {
+        operation: query,
+        variables,
+        headers,
+        requestOptions,
+      },
+      rest,
+    )
   } catch (err) {
     return [null, { name: '#236754348', message: err }]
   }
 }
 
-// /**
-//  * Mutation method
-//  *
-//  * @param {Object!} options
-//  * @param {String!} options.mutation - gql mutation string
-//  * @param {Object} options.variables - mutation variables
-//  * @param {Object} options.requestOptions - addition options to fetch request (refer to fetch api)
-//  * @param {String} options.refetchQuery - name of query whose data you wish to update in the cache
-//  * @param {TBD} options.updateItem
-//  * @param {TBD} options.deleteItem
-//  *
-//  * @return {Object} *
-//  * @return {Object} *.<mutation_name> - contains all query data where the name of the query is the key
-//  * @return {Object} *.error
-//  */
-// MinusQL.prototype.mutation = function mutation({
-//   mutation,
-//   variables,
-//   requestOptions,
-//   refetchQuery,
-//   updateItem,
-//   deleteItem,
-//   ...rest
-// }) {
-//   const hasOperation = !!mutation
-//   validateResolver('mutation', hasOperation, rest)
-//   // If there is no operation, validateResolver handles throwing the error
-//   // Then we bail because we need the operation to successfully run this function
-//   if (!hasOperation) return
+/**
+ * Mutation method
+ */
+interface MutationInput {
+  mutation: string // gql query string
+  variables: Object
+  headers?: RequestHeaders // additional headers (refer to fetch api)
+  requestOptions?: Object // additional options to fetch request (refer to fetch api)
+  [key: string]: any
+}
 
-//   const options = aggregateOptions({
-//     operation: mutation,
-//     variables,
-//     requestOptions,
-//     refetchQuery,
-//     updateItem,
-//     deleteItem,
-//   })
+MinusQL.prototype.mutation = async function mutation({
+  mutation,
+  variables,
+  headers,
+  requestOptions,
+  // refetchQuery,
+  // updateItem,
+  // deleteItem,
+  ...rest
+}: MutationInput): Promise<MinusQLReturn> {
+  try {
+    return this.aggregateResolvers(
+      'mutation',
+      {
+        operation: mutation,
+        variables,
+        headers,
+        requestOptions,
+      },
+      rest,
+    )
+  } catch (err) {
+    return [null, { name: '#434823675', message: err }]
+  }
+}
 
-//   return this.fetchHandler(options)
-//     .then(res => {
-//       return res
-//     })
-//     .catch(err => {
-//       console.error(err)
-//     })
-// }
+/**
+ * Aggregate Resolvers method
+ */
+interface AggregateResolveOptions {
+  operation: string
+  variables
+  headers
+  requestOptions
+}
 
+MinusQL.prototype.aggregateResolvers = async function aggregateResolvers(
+  operationType: string,
+  options: AggregateResolveOptions,
+  rest: { [key: string]: string } = {},
+): Promise<MinusQLReturn> {
+  try {
+    if (options && !options.operation) {
+      return [
+        null,
+        {
+          name: '#736592202',
+          message: `${operationType} method requires a '${operationType}' operation as a GQL string`,
+        },
+      ]
+    }
+    if (Object.keys(rest).length !== 0) {
+      return [
+        null,
+        {
+          name: '#3425822457',
+          message: `${Object.keys(rest)[0]} is not a valid option`,
+        },
+      ]
+    }
+
+    if (options && options.headers) {
+      this.headers = { ...this.headers, headers: options.headers }
+    }
+    if (options && options.requestOptions) {
+      this.requestOptions = {
+        ...this.requestOptions,
+        requestOptions: options.requestOptions,
+      }
+    }
+
+    const [data, error] = await this.fetchHandler({
+      operation: options.operation,
+      variables: options.variables,
+    })
+    if (error !== null) {
+      return [null, error]
+    }
+    return [data, null]
+  } catch (err) {
+    return [null, { name: '#7538289028', message: err }]
+  }
+}
+
+/**
+ * Fetch handler
+ */
 interface FetchHandlerInput {
   operation: string // gql query string
   variables: Object // resolver variables
@@ -166,16 +199,13 @@ interface FetchHandlerInput {
   // deleteItem?: Object
 }
 
-/**
- * Fetch handler
- */
 MinusQL.prototype.fetchHandler = async function fetchHandler({
   operation,
   variables,
-  // refetchQuery,
-  // updateItem,
-  // deleteItem,
-}): Promise<MinusQLReturn> {
+}: // refetchQuery,
+// updateItem,
+// deleteItem,
+FetchHandlerInput): Promise<MinusQLReturn> {
   try {
     // // TODO: Write better parser
     // const [operationType, operationName] = gqlParser(operation)
