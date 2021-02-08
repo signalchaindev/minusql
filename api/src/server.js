@@ -28,7 +28,11 @@ const gqlServerEndpoint = process.env.GQL_SERVER_ENDPOINT_BASE
 const gqlServerPath = process.env.GQL_SERVER_PATH
 
 const corsOptions = {
-  origin: 'http://localhost:3001',
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+  ],
   credentials: true,
   methods: 'GET,POST,PUT,PATCH,DELETE',
   preflightContinue: false,

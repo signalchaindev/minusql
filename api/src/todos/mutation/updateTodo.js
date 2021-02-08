@@ -1,7 +1,7 @@
 import todos from '../../../database/todos.js'
-import getTodoById from '../query/getTodoById.js'
+import { getTodoById } from '../query/getTodoById.js'
 
-export default function updateTodo(_, args) {
+export function updateTodo(_, args) {
   const { id, todo } = args
   let updateTodo = getTodoById(_, { id })
 

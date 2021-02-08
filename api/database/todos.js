@@ -7,13 +7,13 @@ const seed = [
     id: generateId(),
     todo: 'Learn some GraphQL',
     completed: false,
-    description: ''
+    description: '',
   },
   {
     id: generateId(),
     todo: 'Launch awesome app!',
     completed: false,
-    description: ''
+    description: '',
   },
 ]
 

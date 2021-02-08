@@ -1,18 +1,18 @@
 <script>
-  import { client, gql } from '../graphql.js'
-  import { GET_ALL_TODOS_QUERY } from './getAllTodos.js'
+  import { client, gql } from "../graphql.js";
+  import { GET_ALL_TODOS_QUERY } from "./getAllTodos.js";
 
-  export let todo
-  $: completed = todo.completed
+  export let todo;
+  $: completed = todo.completed;
 
   const UPDATE_TODO_MUTATION = gql`
     mutation UPDATE_TODO_MUTATION($id: ID!, $todo: TodoInput!) {
       updateTodo(id: $id, todo: $todo)
     }
-  `
+  `;
 
   async function updateTodo() {
-    completed = !completed
+    completed = !completed;
 
     const { data, error } = await client.mutation({
       mutation: UPDATE_TODO_MUTATION,
@@ -24,13 +24,13 @@
         },
       },
       refetchQuery: { query: GET_ALL_TODOS_QUERY },
-    })
+    });
 
     if (error) {
-      console.error(error)
+      console.error(error);
     }
 
-    console.log(data.updateTodo)
+    console.log(data.updateTodo);
   }
 </script>
 
@@ -55,9 +55,9 @@
     line-height: 0px;
   }
 
-  li + li {
+  /* li + li {
     margin-top: 8px;
-  }
+  } */
 
   label {
     display: block;

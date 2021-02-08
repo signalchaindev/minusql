@@ -7,6 +7,7 @@
 
   let todos
   $: todos = todos
+  $: console.log('todos:', todos)
 
   onMount(async function () {
     const GET_ALL_TODOS_QUERY = gql`

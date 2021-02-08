@@ -1,7 +1,7 @@
 import todos from '../../../database/todos.js'
 import generateId from '../../../database/utils/generateId.js'
 
-export default function createTodo(_, args) {
+export function createTodo(_, args) {
   const { todo, completed } = args.input
 
   const id = generateId()
