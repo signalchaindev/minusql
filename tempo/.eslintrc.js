@@ -7,9 +7,9 @@ module.exports = {
   },
   parser: 'babel-eslint',
   parserOptions: {
-    ecmaVersion: 2019,
+    ecmaVersion: 2020,
     sourceType: 'module',
-    allowImportExportEverywhere: true,
+    allowImportExportEverywhere: true, // dynamic import
   },
   extends: ['standard'],
   globals: {
@@ -23,7 +23,7 @@ module.exports = {
   rules: {
     camelcase: 0,
     'comma-dangle': ['error', 'always-multiline'],
-    'import/first': 0,
+    'import/first': 1,
     indent: ['error', 2, { SwitchCase: 1 }],
     'linebreak-style': ['error', 'unix'],
     'node/no-deprecated-api': [
@@ -35,23 +35,27 @@ module.exports = {
       },
     ],
     'no-labels': 'error',
-    'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 0 }],
+    'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
     'no-restricted-syntax': ['error', 'LabeledStatement'],
     'no-self-assign': 'error',
     'no-sequences': 0,
     'no-undef': 'error',
     'no-unused-labels': 'error',
+    'no-unexpected-multiline': 'error',
     'no-unused-vars': [
       'error',
       {
-        argsIgnorePattern: '^_|req|res|next|args|ctx',
-        varsIgnorePattern: '^_|req|res|next|args|ctx',
+        argsIgnorePattern: '^_|req|res|next|args|ctx|__',
+        varsIgnorePattern: '^_|req|res|next|args|ctx|__',
       },
     ],
     'no-use-before-define': 'error',
     'no-var': 'error',
     'object-shorthand': ['error', 'always'],
-    'prefer-const': 2,
+    'prefer-const': [
+      'error',
+      { destructuring: 'all', ignoreReadBeforeAssign: true },
+    ],
     'keyword-spacing': [
       'error',
       {
@@ -59,15 +63,15 @@ module.exports = {
         before: true,
       },
     ],
+    semi: 'error',
     'space-before-function-paren': [
       'error',
       {
-        anonymous: 'never',
+        anonymous: 'always',
         named: 'never',
         asyncArrow: 'always',
       },
     ],
-    semi: 'error',
     quotes: [
       'error',
       'single',

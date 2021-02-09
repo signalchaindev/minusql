@@ -1,5 +1,5 @@
 /**
- * @param {String} Any
+ * @param {String}
  *
  * @return {Array}
  * if param string is valid JSON, safeJsonParse returns the parsed JSON and null

@@ -27,7 +27,9 @@ export default {
     typescript(tsOptions),
     production && terser(),
   ],
-  external: Object.keys(pkg.dependencies || {}).concat(
+  external: [].concat(
+    Object.keys(pkg.dependencies || {}),
+    Object.keys(pkg.peerDependencies || {}),
     Object.keys(process.binding('natives')),
   ),
   onwarn: (warning, onwarn) =>

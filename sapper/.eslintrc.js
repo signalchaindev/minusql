@@ -2,16 +2,16 @@ module.exports = {
   root: true,
   env: {
     es6: true,
+    browser: true,
     node: true,
-    mocha: true,
   },
-  parser: '@typescript-eslint/parser',
+  parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
     allowImportExportEverywhere: true, // dynamic import
   },
-  extends: ['standard', 'plugin:mocha/recommended'],
+  extends: ['standard'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
@@ -19,26 +19,19 @@ module.exports = {
     caches: true,
     fetch: true,
   },
-  plugins: ['import', 'json', '@typescript-eslint', 'mocha'],
-  settings: {
-    'import/resolver': {
-      typescript: {}, // this loads <rootdir>/tsconfig.json to eslint
+  plugins: ['svelte3', 'graphql', 'json'],
+  overrides: [
+    {
+      files: ['**/*.svelte'],
+      processor: 'svelte3/svelte3',
     },
+  ],
+  settings: {
+    'svelte3/ignore-styles': attributes =>
+      attributes.lang && attributes.lang.includes('scss'),
+    // 'svelte3/ignore-warnings': ({ code }) => code === 'missing-declaration',
   },
   rules: {
-    // ENV Specific
-    '@typescript-eslint/no-extra-semi': 0,
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      {
-        argsIgnorePattern: '^_|req|res|next|args|ctx|__',
-        varsIgnorePattern: '^_|req|res|next|args|ctx|__',
-      },
-    ],
-    'mocha/handle-done-callback': 'error',
-    'mocha/no-mocha-arrows': 0,
-    // END
-
     camelcase: 0,
     'comma-dangle': ['error', 'always-multiline'],
     'import/first': 1,
@@ -63,8 +56,8 @@ module.exports = {
     'no-unused-vars': [
       'error',
       {
-        argsIgnorePattern: '^_|req|res|next|args|ctx|__',
-        varsIgnorePattern: '^_|req|res|next|args|ctx|__',
+        argsIgnorePattern: '^_|req|res|next|args|ctx',
+        varsIgnorePattern: '^_|req|res|next|args|ctx',
       },
     ],
     'no-use-before-define': 'error',
@@ -81,7 +74,7 @@ module.exports = {
         before: true,
       },
     ],
-    semi: 0,
+    semi: 'error',
     'space-before-function-paren': [
       'error',
       {

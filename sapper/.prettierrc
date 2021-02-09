@@ -6,5 +6,10 @@
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "all",
-  "useTabs": false
+  "useTabs": false,
+
+  "svelteSortOrder": "scripts-markup-styles",
+  "svelteAllowShorthand": true,
+  "svelteBracketNewLine": true,
+  "svelteStrictMode": false
 }
