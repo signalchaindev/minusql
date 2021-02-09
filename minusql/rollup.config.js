@@ -25,7 +25,11 @@ export default {
     }),
     commonjs(),
     typescript(tsOptions),
-    production && terser(),
+    production && terser({
+      output: {
+        comments: () => false,
+      },
+    }),
   ],
   external: [].concat(
     Object.keys(pkg.dependencies || {}),

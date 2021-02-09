@@ -22,8 +22,14 @@ module.exports = {
   plugins: ['svelte3', 'graphql', 'json'],
   overrides: [
     {
-      files: ['**/*.svelte'],
+      files: ['*.svelte'],
       processor: 'svelte3/svelte3',
+      rules: {
+        'import/first': 0,
+        'import/no-duplicates': 0,
+        'import/no-mutable-exports': 0,
+        'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 2, maxEOF: 0 }], // maxBOF is to fix a Svelte specific problem
+      },
     },
   ],
   settings: {
@@ -34,7 +40,7 @@ module.exports = {
   rules: {
     camelcase: 0,
     'comma-dangle': ['error', 'always-multiline'],
-    'import/first': 1,
+    'import/first': 2,
     indent: ['error', 2, { SwitchCase: 1 }],
     'linebreak-style': ['error', 'unix'],
     'node/no-deprecated-api': [
@@ -46,7 +52,7 @@ module.exports = {
       },
     ],
     'no-labels': 'error',
-    'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
+    'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],
     'no-restricted-syntax': ['error', 'LabeledStatement'],
     'no-self-assign': 'error',
     'no-sequences': 0,

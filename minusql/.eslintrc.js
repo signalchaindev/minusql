@@ -41,7 +41,7 @@ module.exports = {
 
     camelcase: 0,
     'comma-dangle': ['error', 'always-multiline'],
-    'import/first': 1,
+    'import/first': 2,
     indent: ['error', 2, { SwitchCase: 1 }],
     'linebreak-style': ['error', 'unix'],
     'node/no-deprecated-api': [
@@ -53,7 +53,7 @@ module.exports = {
       },
     ],
     'no-labels': 'error',
-    'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
+    'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],
     'no-restricted-syntax': ['error', 'LabeledStatement'],
     'no-self-assign': 'error',
     'no-sequences': 0,
