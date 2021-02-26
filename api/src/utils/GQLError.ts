@@ -1,4 +1,4 @@
-import { isEmpty } from './isEmpty' // .ts
+import { isEmpty } from "./isEmpty" // .ts
 
 /**
  * GQLError logs error description on the server and throws an error to be sent to the client
@@ -10,7 +10,7 @@ import { isEmpty } from './isEmpty' // .ts
  */
 export function GQLError(
   errorDescription: string,
-  errorObject?: { [key: string]: string | null | undefined },
+  errorObject?: { [key: string]: string },
 ) {
   console.error(`Error: ${errorDescription}`)
   let err = errorObject
@@ -19,6 +19,5 @@ export function GQLError(
     err = { alert: errorDescription }
   }
 
-  const msg = JSON.stringify(err)
-  throw new Error(msg)
+  throw new Error(JSON.stringify(err))
 }

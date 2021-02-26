@@ -1,10 +1,10 @@
-import { GraphQLScalarType } from 'graphql'
-import { Kind } from 'graphql/language'
+import { GraphQLScalarType } from "graphql"
+import { Kind } from "graphql/language/index.js"
 
 export default {
   Date: new GraphQLScalarType({
-    name: 'Date',
-    description: 'Date custom scalar',
+    name: "Date",
+    description: "Date custom scalar",
     parseValue(value) {
       return new Date(value) // value from the client
     },

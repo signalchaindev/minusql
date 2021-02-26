@@ -1,9 +1,10 @@
 {
   "arrowParens": "avoid",
   "bracketSpacing": true,
+  "endOfLine": "lf",
   "printWidth": 80,
   "semi": false,
-  "singleQuote": true,
+  "singleQuote": false,
   "tabWidth": 2,
   "trailingComma": "all",
   "useTabs": false,
@@ -11,5 +12,6 @@
   "svelteSortOrder": "scripts-markup-styles",
   "svelteAllowShorthand": true,
   "svelteBracketNewLine": true,
-  "svelteStrictMode": false
+  "svelteStrictMode": false,
+  "svelteIndentScriptAndStyle": true
 }

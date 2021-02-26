@@ -1,14 +1,14 @@
-import fs from 'fs'
-import path from 'path'
-import chalk from 'chalk'
+import fs from "fs"
+import path from "path"
+import kleur from "kleur"
 
 export function rimraf(entry_path) {
   if (!entry_path) {
-    throw new Error(chalk.red('rimraf requires a path to a directory or file'))
+    throw new Error(kleur.red("rimraf requires a path to a directory or file"))
   }
 
   if (!fs.existsSync(entry_path)) {
-    console.warn(chalk.yellow(`path does not exist: ${entry_path}`))
+    console.warn(kleur.yellow(`path does not exist: ${entry_path}`))
     return
   }
 

@@ -1,8 +1,17 @@
+import fs from 'fs'
+import path from 'path'
+import module from 'module'
 import commonjs from '@rollup/plugin-commonjs'
 import { terser } from 'rollup-plugin-terser'
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
-import pkg from './package.json'
+
+const pkg = JSON.parse(
+  fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'),
+)
+if (Object.keys(pkg).length < 1) {
+  console.error('Failed to parse package.json')
+}
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -25,16 +34,17 @@ export default {
     }),
     commonjs(),
     typescript(tsOptions),
-    production && terser({
-      output: {
-        comments: () => false,
-      },
-    }),
+    production &&
+      terser({
+        output: {
+          comments: () => false,
+        },
+      }),
   ],
   external: [].concat(
     Object.keys(pkg.dependencies || {}),
     Object.keys(pkg.peerDependencies || {}),
-    Object.keys(process.binding('natives')),
+    module.builtinModules,
   ),
   onwarn: (warning, onwarn) =>
     warning.code === 'CIRCULAR_DEPENDENCY' && onwarn(warning),

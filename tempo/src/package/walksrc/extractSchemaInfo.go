@@ -29,7 +29,7 @@ func ExtractSchemaInfo(root, srcdir, ext string) {
 	if err != nil {
 		log.Fatalf("could not find the relative path of the build directory:\n%s", err)
 	}
-	depth := len(strings.Split(rel, string(filepath.Separator))) - 1 // adjust depth for build dir being inside the src
+	depth := len(strings.Split(rel, string(os.PathSeparator))) - 1 // adjust depth for build dir being inside the src
 	var relativeRoot = strings.Repeat("../", depth)
 
 	var schema []byte
@@ -50,45 +50,41 @@ func ExtractSchemaInfo(root, srcdir, ext string) {
 			return nil // Early return if the file starts with an underscore
 		}
 
-		// Concatenate graphql files
-		if filepath.Ext(fp) == ".graphql" && ext == ".graphql" || filepath.Ext(fp) == ".graphql" && ext == "any" {
-			wg.Add(1)
-			go func(path string) {
+		wg.Add(1)
+		go func(path, name string) {
+			// Concatenate graphql files
+			if filepath.Ext(path) == ".graphql" && ext == ".graphql" || filepath.Ext(path) == ".graphql" && ext == "any" {
 				contents, err := ioutil.ReadFile(path)
 				if err != nil {
 					log.Fatalf("could not read file at path: %s\n%s", path, err)
 				}
 
 				schema = append(schema, contents...)
-				wg.Done()
-			}(fp)
-		}
 
-		// Handle .js and .ts files
-		if ext == ".js" || ext == ".ts" || ext == "any" {
-			if filepath.Ext(fp) == ".js" || filepath.Ext(fp) == ".ts" {
-				if strings.Contains(fp, "mutation") || strings.Contains(fp, "query") {
-					wg.Add(1)
-					go func(p, s, n string) {
-						relPath := strings.Split(p, s)[1][1:]
-						fnToJs := strings.TrimSuffix(filepath.ToSlash(relPath), filepath.Ext(n))
-						functionName := strings.TrimSuffix(n, filepath.Ext(n))
+			}
+
+			// Handle .js and .ts files
+			if ext == ".js" || ext == ".ts" || ext == "any" {
+				if filepath.Ext(path) == ".js" || filepath.Ext(path) == ".ts" {
+					if strings.Contains(path, "mutation") || strings.Contains(path, "query") {
+						relPath := strings.Split(path, srcdir)[1][1:]
+						fnToJs := strings.TrimSuffix(filepath.ToSlash(relPath), filepath.Ext(name))
+						functionName := strings.TrimSuffix(name, filepath.Ext(name))
 
 						fmt.Fprintf(&imports, "import { %s } from \"%s%s\";\n", functionName, relativeRoot, fmt.Sprintf("%s.js", fnToJs))
 
-						if strings.Contains(fp, "mutation") {
+						if strings.Contains(path, "mutation") {
 							fmt.Fprintf(&mutationMap, "\n\t\t%s,", functionName)
 						}
 
-						if strings.Contains(fp, "query") {
+						if strings.Contains(path, "query") {
 							fmt.Fprintf(&queryMap, "\n\t\t%s,", functionName)
 						}
-
-						wg.Done()
-					}(fp, srcdir, info.Name())
+					}
 				}
 			}
-		}
+			wg.Done()
+		}(fp, info.Name())
 
 		return nil
 	})
@@ -99,48 +95,60 @@ func ExtractSchemaInfo(root, srcdir, ext string) {
 
 	wg.Wait()
 
+	var writeWG sync.WaitGroup
+
+	/**
+	 * Output typeDefs
+	 */
 	if ext == ".graphql" || ext == "any" {
-		/**
-		 * Output typeDefs
-		 */
-		tempDir, err := filepath.Abs(path.Join("../../", "temp"))
-		if err != nil {
-			log.Fatalf("could not create path for the tempDir:\n%s", err)
-		}
-		err = os.RemoveAll(tempDir)
-		if err != nil {
-			log.Fatal(err)
-		}
-		os.MkdirAll(tempDir, os.ModePerm)
+		writeWG.Add(1)
+		go func() {
+			tempDir, err := filepath.Abs(path.Join("../../", "temp"))
+			if err != nil {
+				log.Fatalf("could not create path for the tempDir:\n%s", err)
+			}
+			err = os.RemoveAll(tempDir)
+			if err != nil {
+				log.Fatal(err)
+			}
+			os.MkdirAll(tempDir, os.ModePerm)
 
-		typeDefsOutputPath, err := filepath.Abs(path.Join(tempDir, "typeDefs.graphql"))
-		if err != nil {
-			log.Fatalf("could not create path for typeDefs.graphql:\n%s", err)
-		}
-		err = ioutil.WriteFile(typeDefsOutputPath, schema, 0644)
-		if err != nil {
-			log.Fatalf("could not write typeDefs.graphql:\n%s", err)
-		}
+			typeDefsOutputPath, err := filepath.Abs(path.Join(tempDir, "typeDefs.graphql"))
+			if err != nil {
+				log.Fatalf("could not create path for typeDefs.graphql:\n%s", err)
+			}
+			err = ioutil.WriteFile(typeDefsOutputPath, schema, 0644)
+			if err != nil {
+				log.Fatalf("could not write typeDefs.graphql:\n%s", err)
+			}
+			writeWG.Done()
+		}()
 	}
 
+	/**
+	 * Output resolvers
+	 */
 	if ext == ".js" || ext == ".ts" || ext == "any" {
-		var resolverMap strings.Builder
-		fmt.Fprintf(&resolverMap, "%s\nexport const resolvers = {\n\tMutation: {%s\n\t},\n\tQuery: {%s\n\t},\n}\n", imports.String(), mutationMap.String(), queryMap.String())
+		writeWG.Add(1)
+		go func() {
+			var resolverMap strings.Builder
+			fmt.Fprintf(&resolverMap, "%s\nexport const resolvers = {\n\tMutation: {%s\n\t},\n\tQuery: {%s\n\t},\n}\n", imports.String(), mutationMap.String(), queryMap.String())
 
-		/**
-		 * Output resolvers
-		 */
-		resolverMapOutputPath, err := filepath.Abs(path.Join(buildDir, "resolvers.js"))
-		if err != nil {
-			log.Fatalf("could not create path for resolvers.js:\n%s", err)
-		}
-		err = os.RemoveAll(resolverMapOutputPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = ioutil.WriteFile(resolverMapOutputPath, []byte(resolverMap.String()), 0644)
-		if err != nil {
-			log.Fatalf("could not write resolvers.js:\n%s", err)
-		}
+			resolverMapOutputPath, err := filepath.Abs(path.Join(buildDir, "resolvers.js"))
+			if err != nil {
+				log.Fatalf("could not create path for resolvers.js:\n%s", err)
+			}
+			err = os.RemoveAll(resolverMapOutputPath)
+			if err != nil {
+				log.Fatal(err)
+			}
+			err = ioutil.WriteFile(resolverMapOutputPath, []byte(resolverMap.String()), 0644)
+			if err != nil {
+				log.Fatalf("could not write resolvers.js:\n%s", err)
+			}
+			writeWG.Done()
+		}()
 	}
+
+	writeWG.Wait()
 }

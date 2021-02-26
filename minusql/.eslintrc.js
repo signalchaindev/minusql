@@ -1,3 +1,6 @@
+/** @type {import('eslint').Linter.Config} */
+
+/* eslint-disable import/no-commonjs */
 module.exports = {
   root: true,
   env: {
@@ -5,94 +8,167 @@ module.exports = {
     node: true,
     mocha: true,
   },
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: 'module',
+    sourceType: "module",
     allowImportExportEverywhere: true, // dynamic import
   },
-  extends: ['standard', 'plugin:mocha/recommended'],
+  extends: ["standard", "eslint:recommended", "plugin:mocha/recommended"],
   globals: {
-    Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly',
+    Atomics: "readonly",
+    SharedArrayBuffer: "readonly",
     self: true,
     caches: true,
     fetch: true,
   },
-  plugins: ['import', 'json', '@typescript-eslint', 'mocha'],
+  plugins: [
+    "@typescript-eslint",
+    "prettier",
+    "node",
+    "import",
+    "json",
+    "mocha",
+  ],
   settings: {
-    'import/resolver': {
+    "import/resolver": {
       typescript: {}, // this loads <rootdir>/tsconfig.json to eslint
     },
   },
   rules: {
     // ENV Specific
-    '@typescript-eslint/no-extra-semi': 0,
-    '@typescript-eslint/no-unused-vars': [
-      'error',
+    "@typescript-eslint/no-extra-semi": 0,
+    "@typescript-eslint/no-unused-vars": [
+      "error",
       {
-        argsIgnorePattern: '^_|req|res|next|args|ctx|__',
-        varsIgnorePattern: '^_|req|res|next|args|ctx|__',
+        argsIgnorePattern: "^_|req|res|next|args|ctx|__",
+        varsIgnorePattern: "^_|req|res|next|args|ctx|__",
       },
     ],
-    'mocha/handle-done-callback': 'error',
-    'mocha/no-mocha-arrows': 0,
+    "mocha/handle-done-callback": "error",
+    "mocha/no-mocha-arrows": 0,
     // END
 
     camelcase: 0,
-    'comma-dangle': ['error', 'always-multiline'],
-    'import/first': 2,
-    indent: ['error', 2, { SwitchCase: 1 }],
-    'linebreak-style': ['error', 'unix'],
-    'node/no-deprecated-api': [
-      'error',
+    "comma-dangle": ["error", "always-multiline"],
+    "import/default": "error",
+    "import/export": "error",
+    "import/extensions": [
+      "error",
+      "always",
       {
-        version: '>=10.0.0',
-        ignoreModuleItems: [],
-        ignoreGlobalItems: ['process.binding'],
+        js: "always",
+        ts: "never", // Should be set to always. Prevented by Typescript error.
       },
     ],
-    'no-labels': 'error',
-    'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],
-    'no-restricted-syntax': ['error', 'LabeledStatement'],
-    'no-self-assign': 'error',
-    'no-sequences': 0,
-    'no-undef': 'error',
-    'no-unused-labels': 'error',
-    'no-unexpected-multiline': 'error',
-    'no-unused-vars': [
-      'error',
+    "import/first": "error",
+    "import/named": "error",
+    "import/namespace": "error",
+    "import/newline-after-import": ["error", { count: 1 }],
+    "import/no-anonymous-default-export": [
+      2,
       {
-        argsIgnorePattern: '^_|req|res|next|args|ctx|__',
-        varsIgnorePattern: '^_|req|res|next|args|ctx|__',
+        allowArray: true,
+        allowObject: true,
       },
     ],
-    'no-use-before-define': 'error',
-    'no-var': 'error',
-    'object-shorthand': ['error', 'always'],
-    'prefer-const': [
-      'error',
-      { destructuring: 'all', ignoreReadBeforeAssign: true },
-    ],
-    'keyword-spacing': [
-      'error',
+    "import/no-commonjs": 2,
+    "import/no-cycle": [2, { ignoreExternal: true }],
+    "import/no-deprecated": "error",
+    "import/no-duplicates": "error",
+    "import/no-extraneous-dependencies": "error",
+    "import/no-internal-modules": 0,
+    "import/no-mutable-exports": "error",
+    "import/no-named-as-default-member": "error",
+    "import/no-named-as-default": "error",
+    "import/no-named-default": "error",
+    "import/no-self-import": "error",
+    "import/no-unresolved": "error",
+    "import/no-unused-modules": "error",
+    "import/no-useless-path-segments": "error",
+    "import/order": "error",
+    indent: ["error", 2, { SwitchCase: 1 }],
+    "keyword-spacing": [
+      "error",
       {
         after: true,
         before: true,
       },
     ],
-    semi: 0,
-    'space-before-function-paren': [
-      'error',
+    "linebreak-style": ["error", "unix"],
+    "node/no-deprecated-api": [
+      "error",
       {
-        anonymous: 'always',
-        named: 'never',
-        asyncArrow: 'always',
+        version: ">=14.0.0",
+        ignoreModuleItems: [],
+        ignoreGlobalItems: [],
+      },
+    ],
+    "no-labels": "error",
+    "no-multi-spaces": "error",
+    "no-multiple-empty-lines": ["error", { max: 1, maxBOF: 0, maxEOF: 0 }],
+    "no-restricted-syntax": ["error", "LabeledStatement"],
+    "no-self-assign": "error",
+    "no-sequences": 0,
+    "no-undef": "error",
+    "no-unused-labels": "error",
+    "no-unexpected-multiline": "error",
+    "no-unreachable": "warn",
+    "no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_|req|res|next|args|ctx|__",
+        varsIgnorePattern: "^_|req|res|next|args|ctx|__",
+      },
+    ],
+    "no-use-before-define": "error",
+    "no-var": "error",
+    "object-shorthand": ["error", "always"],
+    "prefer-const": [
+      "error",
+      { destructuring: "all", ignoreReadBeforeAssign: true },
+    ],
+    "prettier/prettier": [
+      "error",
+      {
+        arrowParens: "avoid",
+        bracketSpacing: true,
+        endOfLine: "lf",
+        printWidth: 80,
+        semi: false,
+        singleQuote: false,
+        tabWidth: 2,
+        trailingComma: "all",
+        useTabs: false,
+      },
+    ],
+    semi: "error",
+    "space-before-function-paren": [
+      "error",
+      {
+        anonymous: "always",
+        named: "never",
+        asyncArrow: "always",
+      },
+    ],
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        line: {
+          markers: ["!", "?", "*"],
+          exceptions: ["-", "*"],
+        },
+        block: {
+          markers: ["!", "?", "*"],
+          exceptions: ["-", "*"],
+          balanced: true,
+        },
       },
     ],
     quotes: [
-      'error',
-      'single',
+      "error",
+      "double",
       {
         avoidEscape: true,
       },

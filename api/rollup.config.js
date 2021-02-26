@@ -1,20 +1,35 @@
-import child_process from 'child_process'
 import fs from 'fs'
 import path from 'path'
+import module from 'module'
+import child_process from 'child_process'
 import { performance } from 'perf_hooks'
-import * as esbuild from 'esbuild'
+import esbuild from 'esbuild'
 import chokidar from 'chokidar'
-import chalk from 'chalk'
-import { isEmpty } from './src/utils/isEmpty.js'
+import kleur from 'kleur'
+import { buildSchemaAssets } from 'tempo'
+import { isEmpty } from './src/utils/isEmptyJS.js'
 import { rimraf } from './src/utils/rimraf.js'
 import { mkdir } from './src/utils/mkdir.js'
 import { print_elapsed } from './src/utils/print_elapsed.js'
-import { buildSchemaAssets } from 'tempo'
-import pkg from './package.json'
+
+const pkg = JSON.parse(
+  fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'),
+)
+if (isEmpty(pkg)) {
+  console.error('Failed to parse package.json')
+}
 
 //! This is not a rollup config
 //! It's a Tempo config (I just like having the icon)
 // TODO: Move this to a CLI
+
+let initialized = false
+let proc = null
+let openQueue = false
+let called = 0
+let queued = false
+let delay = 3000
+let actionOptions
 
 async function init(options) {
   // We are not passing options yet
@@ -36,6 +51,7 @@ function watch(options) {
 
   const watchDirs = []
   if (options && options.srcdir && options.srcdir.constructor === String) {
+    watchDirs.push('./rollup.config.js')
     watchDirs.push(`./${options.srcdir}/**/*.js`)
     watchDirs.push(`./${options.srcdir}/**/*.ts`)
     watchDirs.push(`./${options.srcdir}/**/*.graphql`)
@@ -62,52 +78,50 @@ function watch(options) {
       })
     })
     .on('change', actionPath => {
-      serve(options, {
-        action: 'CHANGED_FILE',
-        message: 'Changed file',
-        actionPath,
-      })
+      openQueue &&
+        serve(options, {
+          action: 'CHANGED_FILE',
+          message: 'Changed file',
+          actionPath,
+        })
     })
     .on('add', actionPath => {
-      serve(options, {
-        action: 'ADDED_FILE',
-        message: 'Added file',
-        actionPath,
-      })
+      openQueue &&
+        serve(options, {
+          action: 'ADDED_FILE',
+          message: 'Added file',
+          actionPath,
+        })
     })
     .on('addDir', actionPath => {
-      serve(options, {
-        action: 'ADDED_DIRECTORY',
-        message: 'Added directory',
-        actionPath,
-      })
+      openQueue &&
+        serve(options, {
+          action: 'ADDED_DIRECTORY',
+          message: 'Added directory',
+          actionPath,
+        })
     })
     .on('unlink', actionPath => {
-      serve(options, {
-        action: 'REMOVED_FILE',
-        message: 'Removed file',
-        actionPath,
-      })
+      openQueue &&
+        serve(options, {
+          action: 'REMOVED_FILE',
+          message: 'Removed file',
+          actionPath,
+        })
     })
     .on('unlinkDir', actionPath => {
-      serve(options, {
-        action: 'REMOVED_DIRECTORY',
-        message: 'Removed directory',
-        actionPath,
-      })
+      openQueue &&
+        serve(options, {
+          action: 'REMOVED_DIRECTORY',
+          message: 'Removed directory',
+          actionPath,
+        })
     })
     .on('error', error => {
       console.log(`[tempo] Watch error: ${error}`)
     })
 }
 
-let initialized = false
-let proc = null
-let openQueue = false
-let called = 0
-let queued = false
-let delay = 3000
-let actionOptions
 async function serve(options, actions) {
   actionOptions = actions
   const start = performance.now()
@@ -119,20 +133,22 @@ async function serve(options, actions) {
   called = performance.now()
   if (initialized === true) {
     console.log(
-      `${chalk.blue('[tempo] ' + actions.message)} ${chalk.green(
+      `${kleur.blue('[tempo] ' + actions.message)} ${kleur.green(
         actions.actionPath,
       )}`,
     )
   } else {
-    console.log(chalk.blue('[tempo] Starting watch...'))
+    console.log(kleur.blue('[tempo] Starting watch...'))
   }
   initialized = true
 
-  await build(options, {
+  const status = await build(options, {
     ...actions,
     ext: openQueue ? path.extname(actions.actionPath) : 'any',
   })
-  proc = child_process.fork(path.join(process.cwd(), 'dist', 'server.js'))
+  if (status === 'BUILD_SUCCESSFUL') {
+    proc = child_process.fork(path.join(process.cwd(), 'dist', 'server.js'))
+  }
 
   if (proc && openQueue && queued === true) {
     setTimeout(() => {
@@ -163,22 +179,26 @@ async function build(options, actions) {
 
     const bundleStart = performance.now()
     await esbuild.build({
-      entryPoints: [`${path.join(process.cwd(), 'src', 'server.js')}`],
+      entryPoints: ['./src/server.ts'],
       outdir: targetDir,
+      format: 'esm',
+      target: 'es2019',
+      platform: 'node',
       bundle: true,
       sourcemap: true,
-      minify: false,
-      external: Object.keys(pkg.dependencies).concat(
-        require('module').builtinModules ||
-          Object.keys(process.binding('natives')),
+      minify: true,
+      tsconfig: './tsconfig.json',
+      external: [].concat(
+        Object.keys(pkg.dependencies || {}),
+        module.builtinModules,
       ),
-      format: 'esm',
-      platform: 'node',
-      // plugins: [],
     })
     print_elapsed(bundleStart, '[tempo] Build bundle')
+    print_elapsed(initStart, '[tempo] Total build')
+    return 'BUILD_SUCCESSFUL'
   } catch (err) {
-    throw new Error(err)
+    console.error(err)
+    print_elapsed(initStart, '[tempo] Total build')
+    return 'BUILD_FAILED'
   }
-  print_elapsed(initStart, '[tempo] Total build')
 }

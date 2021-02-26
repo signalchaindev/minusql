@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from "fs"
+import path from "path"
 
 export function mkdir(dest) {
   const splitPath = dest.split(path.sep)
@@ -7,7 +7,9 @@ export function mkdir(dest) {
 
   // Walk tree to find missing directories in path
   for (let i = 0; i < splitPath.length; i++) {
-    const walkTree = path.join(splitPath.slice(0, splitPath.length - i).join('/'))
+    const walkTree = path.join(
+      splitPath.slice(0, splitPath.length - i).join("/"),
+    )
     if (fs.existsSync(walkTree)) {
       break
     }

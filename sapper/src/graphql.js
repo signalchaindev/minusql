@@ -1,7 +1,7 @@
-import { MinusQL, gql } from "minusql";
+import { MinusQL, gql } from "minusql"
 
-const endpoint = "http://localhost:3001/__playground";
+const endpoint = `${process.env.GQL_SERVER_ENDPOINT_BASE}/${process.env.GQL_SERVER_PATH}`
 
-const client = new MinusQL({ uri: endpoint });
+const client = new MinusQL({ uri: endpoint })
 
-export { client, gql };
+export { client, gql }

@@ -1,36 +1,20 @@
-/* eslint-disable import/no-commonjs */
 /** @type {import('eslint').Linter.Config} */
-const fs = require("fs")
-const path = require("path")
 
-const schemaPath = path.join(
-  process.cwd(),
-  "api",
-  "src",
-  "node_modules",
-  "@tempo",
-  "typeDefs.js",
-)
-
-const schemaString = fs
-  .readFileSync(schemaPath, "utf-8")
-  .replace("export const typeDefs = `", "")
-  .replace("`", "")
-
+/* eslint-disable import/no-commonjs */
 module.exports = {
   root: true,
   env: {
     es6: true,
-    browser: true,
     node: true,
+    mocha: true,
   },
-  parser: "babel-eslint",
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: "module",
     allowImportExportEverywhere: true, // dynamic import
   },
-  extends: ["standard", "eslint:recommended"],
+  extends: ["standard", "eslint:recommended", "plugin:mocha/recommended"],
   globals: {
     Atomics: "readonly",
     SharedArrayBuffer: "readonly",
@@ -38,35 +22,32 @@ module.exports = {
     caches: true,
     fetch: true,
   },
-  plugins: ["svelte3", "node", "import", "json", "graphql"],
-  overrides: [
-    {
-      files: ["**/*.svelte"],
-      processor: "svelte3/svelte3",
-      rules: {
-        "import/first": 0,
-        "import/no-duplicates": 0,
-        "import/no-extraneous-dependencies": 0,
-        "import/no-mutable-exports": 0,
-        "import/order": 0,
-        "no-multiple-empty-lines": ["error", { max: 1, maxBOF: 2, maxEOF: 0 }], // maxBOF is to fix for files that lead with a script block
-      },
-    },
+  plugins: [
+    "@typescript-eslint",
+    "prettier",
+    "node",
+    "import",
+    "json",
+    "graphql",
+    "mocha",
   ],
   settings: {
-    "svelte3/ignore-styles": attributes =>
-      attributes.lang && attributes.lang.includes("scss"),
+    "import/resolver": {
+      typescript: {}, // this loads <root_dir>/tsconfig.json to eslint
+    },
   },
   rules: {
     // ENV Specific
-    "graphql/template-strings": [
+    "@typescript-eslint/no-extra-semi": 0,
+    "@typescript-eslint/no-unused-vars": [
       "error",
       {
-        env: "literal",
-        tagName: "gql",
-        schemaString,
+        argsIgnorePattern: "^_|req|res|next|args|ctx|__",
+        varsIgnorePattern: "^_|req|res|next|args|ctx|__",
       },
     ],
+    "mocha/handle-done-callback": "error",
+    "mocha/no-mocha-arrows": 0,
     // END
 
     camelcase: 0,
@@ -147,6 +128,20 @@ module.exports = {
     "prefer-const": [
       "error",
       { destructuring: "all", ignoreReadBeforeAssign: true },
+    ],
+    "prettier/prettier": [
+      "error",
+      {
+        arrowParens: "avoid",
+        bracketSpacing: true,
+        endOfLine: "lf",
+        printWidth: 80,
+        semi: false,
+        singleQuote: false,
+        tabWidth: 2,
+        trailingComma: "all",
+        useTabs: false,
+      },
     ],
     semi: "error",
     "space-before-function-paren": [

@@ -1,3 +1,13 @@
 node_modules
 dist
+
+
+# Logs
+yarn-error.log
+.DS_Store
+
+# Environment
+.env
+
+# Generated benchmark files
 src/benchmark
