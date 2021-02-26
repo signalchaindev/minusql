@@ -1,13 +1,14 @@
 <script>
   import { client, gql } from "../graphql.js"
-  import { GET_ALL_TODOS_QUERY } from "./getAllTodos.js"
+  import { cache } from "./cache.js"
 
-  let value
-  $: value = ""
+  $: console.log("IF cache:", $cache)
+
+  let value = ""
 
   const CREATE_TODO_MUTATION = gql`
-    mutation CREATE_TODO_MUTATION($input: TodoInput!) {
-      createTodo(input: $input) {
+    mutation CREATE_TODO_MUTATION($todo: String!) {
+      createTodo(todo: $todo) {
         id
         todo
         completed
@@ -18,22 +19,15 @@
   async function createTodo() {
     const [data, error] = await client.mutation(CREATE_TODO_MUTATION, {
       variables: {
-        input: {
-          todo: value,
-          completed: false,
-        },
+        todo: value,
       },
-      refetchQuery: { query: GET_ALL_TODOS_QUERY },
     })
-
     if (error) {
-      console.error(error.name)
-      console.error(error.message)
+      console.error(error)
       return
     }
 
-    console.log(data)
-
+    cache.set("getAllTodos", [...$cache.getAllTodos, data?.createTodo])
     value = ""
   }
 </script>

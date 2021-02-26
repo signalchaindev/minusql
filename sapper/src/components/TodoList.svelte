@@ -1,36 +1,39 @@
 <script>
-  import { onMount } from "svelte";
-  import Todo from "../components/Todo.svelte";
-  import Loading from "../components/Loading.svelte";
-  import { GET_ALL_TODOS_QUERY } from "./getAllTodos.js";
-  import { client } from "../graphql.js";
+  import { onMount } from "svelte"
+  import { gql } from "../graphql.js"
+  import Todo from "./Todo.svelte"
+  import Loading from "./Loading.svelte"
+  import { cache, useQuery } from "./cache.js"
 
-  let loading = true;
-  let todos = [];
-  $: todos = todos;
+  $: console.log("TL cache:", $cache)
 
-  onMount(() => {
-    fetchTodos();
-  });
+  let loading = true
 
-  async function fetchTodos() {
-    const [data, error] = await client.query(GET_ALL_TODOS_QUERY);
-    if (error !== null) {
-      console.error(error.name);
-      console.error(error.message);
-      return;
+  const GET_ALL_TODOS_QUERY = gql`
+    query GET_ALL_TODOS_QUERY {
+      getAllTodos {
+        id
+        todo
+        completed
+      }
+    }
+  `
+
+  onMount(async () => {
+    const [_, error] = await useQuery(GET_ALL_TODOS_QUERY)
+    if (error) {
+      console.log("Error:", error)
     }
 
-    todos = data && data.getAllTodos;
-    loading = false;
-  }
+    loading = false
+  })
 </script>
 
 {#if loading}
   <Loading />
 {:else}
   <ul>
-    {#each todos as todo}
+    {#each $cache.getAllTodos as todo}
       <Todo {todo} />
     {/each}
   </ul>
@@ -38,6 +41,7 @@
 
 <style>
   ul {
-    margin-top: 24px;
+    margin: 24px auto;
+    max-width: max-content;
   }
 </style>
