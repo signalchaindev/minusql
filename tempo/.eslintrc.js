@@ -62,7 +62,7 @@ module.exports = {
     "import/no-unused-modules": "error",
     "import/no-useless-path-segments": "error",
     "import/order": "error",
-    indent: ["error", 2, { SwitchCase: 1 }],
+    indent: "off", // Fix conflict with Prettier
     "keyword-spacing": [
       "error",
       {

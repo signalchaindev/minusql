@@ -1,5 +1,5 @@
 import fetch from "./utils/isoFetch.js"
-// import gqlParser from "./utils/gql-string-parser.js"
+// import gqlParser from "./utils/gql-string-parser" // .ts
 
 type RequestMethod = "POST"
 
@@ -185,8 +185,10 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
 ): Promise<MinusQLReturn> {
   try {
     // //-------------------------------------------
-    // // TODO: Write better parser
     // const [operationType, operationName] = gqlParser(operation)
+    // console.log("operation:", operation)
+    // console.log("operationType:", operationType)
+    // console.log("operationName:", operationName)
 
     // const isQuery = operationType === "query"
     // const isMutation = operationType === "mutation"

@@ -1,10 +1,5 @@
-function r(m) {
-  return (m && m.default) || m
-}
-
-module.exports = global.fetch =
-  global.fetch ||
-  (typeof process !== 'undefined' &&
-    function (url, opts) {
-      return r(require('node-fetch'))(url.replace(/^\/\//g, 'https://'), opts)
-    })
+const f = m => m
+export default typeof global !== "undefined"
+  ? async (url, opts) =>
+      f(await import("node-fetch"))(url.replace(/^\/\//g, "https://"), opts)
+  : window.fetch

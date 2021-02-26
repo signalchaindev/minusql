@@ -1,3 +1,22 @@
+/* eslint-disable import/no-commonjs */
+/** @type {import('eslint').Linter.Config} */
+const fs = require("fs")
+const path = require("path")
+
+const schemaPath = path.join(
+  process.cwd(),
+  "api",
+  "src",
+  "node_modules",
+  "@tempo",
+  "typeDefs.js",
+)
+
+const schemaString = fs
+  .readFileSync(schemaPath, "utf-8")
+  .replace("export const typeDefs = `", "")
+  .replace("`", "")
+
 module.exports = {
   root: true,
   env: {
@@ -5,82 +24,157 @@ module.exports = {
     browser: true,
     node: true,
   },
+  parser: "babel-eslint",
   parserOptions: {
-    ecmaVersion: 2019,
-    sourceType: 'module',
+    ecmaVersion: 2020,
+    sourceType: "module",
+    allowImportExportEverywhere: true, // dynamic import
   },
-  extends: ['standard'],
+  extends: ["standard", "eslint:recommended"],
   globals: {
-    Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly',
+    Atomics: "readonly",
+    SharedArrayBuffer: "readonly",
     self: true,
     caches: true,
     fetch: true,
   },
-  plugins: ['svelte3', 'graphql', 'json'],
-  // overrides: [
-  //   {
-  //     files: ['**/*.svelte'],
-  //     processor: 'svelte3/svelte3',
-  //   },
-  // ],
+  plugins: ["svelte3", "node", "import", "json", "graphql"],
+  overrides: [
+    {
+      files: ["**/*.svelte"],
+      processor: "svelte3/svelte3",
+      rules: {
+        "import/first": 0,
+        "import/no-duplicates": 0,
+        "import/no-extraneous-dependencies": 0,
+        "import/no-mutable-exports": 0,
+        "import/order": 0,
+        "no-multiple-empty-lines": ["error", { max: 1, maxBOF: 2, maxEOF: 0 }], // maxBOF is to fix for files that lead with a script block
+      },
+    },
+  ],
   settings: {
-    'svelte3/ignore-styles': attributes =>
-      attributes.lang && attributes.lang.includes('scss'),
-    // 'svelte3/ignore-warnings': ({ code }) => code === 'missing-declaration',
+    "svelte3/ignore-styles": attributes =>
+      attributes.lang && attributes.lang.includes("scss"),
   },
   rules: {
+    // ENV Specific
+    "graphql/template-strings": [
+      "error",
+      {
+        env: "literal",
+        tagName: "gql",
+        schemaString,
+      },
+    ],
+    // END
+
     camelcase: 0,
-    'comma-dangle': 0,
-    'import/first': 0,
-    indent: ['error', 2, { SwitchCase: 1 }],
-    'linebreak-style': ['error', 'unix'],
-    'node/no-deprecated-api': [
-      'error',
+    "comma-dangle": ["error", "always-multiline"],
+    "import/default": "error",
+    "import/export": "error",
+    "import/extensions": [
+      "error",
+      "always",
       {
-        version: '>=10.0.0',
-        ignoreModuleItems: [],
-        ignoreGlobalItems: ['process.binding'],
+        js: "always",
+        ts: "never", // Should be set to always. Prevented by Typescript error.
       },
     ],
-    'no-labels': 'error',
-    'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 0 }],
-    'no-restricted-syntax': ['error', 'LabeledStatement'],
-    'no-self-assign': 'error',
-    'no-sequences': 0,
-    'no-undef': 'error',
-    'no-unused-labels': 'error',
-    'no-unused-vars': [
-      'error',
+    "import/first": "error",
+    "import/named": "error",
+    "import/namespace": "error",
+    "import/newline-after-import": ["error", { count: 1 }],
+    "import/no-anonymous-default-export": [
+      2,
       {
-        argsIgnorePattern: '^_|req|res|next|ctx',
-        varsIgnorePattern: '^_|req|res|next|ctx',
+        allowArray: true,
+        allowObject: true,
       },
     ],
-    'no-use-before-define': 'error',
-    'no-var': 'error',
-    'object-shorthand': ['error', 'always'],
-    'prefer-const': 0,
-    'keyword-spacing': [
-      'error',
+    "import/no-commonjs": 2,
+    "import/no-cycle": [2, { ignoreExternal: true }],
+    "import/no-deprecated": "error",
+    "import/no-duplicates": "error",
+    "import/no-extraneous-dependencies": "error",
+    "import/no-internal-modules": 0,
+    "import/no-mutable-exports": "error",
+    "import/no-named-as-default-member": "error",
+    "import/no-named-as-default": "error",
+    "import/no-named-default": "error",
+    "import/no-self-import": "error",
+    "import/no-unresolved": "error",
+    "import/no-unused-modules": "error",
+    "import/no-useless-path-segments": "error",
+    "import/order": "error",
+    indent: "off", // Fix conflict with Prettier
+    "keyword-spacing": [
+      "error",
       {
         after: true,
         before: true,
       },
     ],
-    'space-before-function-paren': [
-      'error',
+    "linebreak-style": ["error", "unix"],
+    "node/no-deprecated-api": [
+      "error",
       {
-        anonymous: 'never',
-        named: 'never',
-        asyncArrow: 'always',
+        version: ">=14.0.0",
+        ignoreModuleItems: [],
+        ignoreGlobalItems: [],
       },
     ],
-    semi: 'error',
-    'space-before-function-paren': 0,
+    "no-labels": "error",
+    "no-multi-spaces": "error",
+    "no-multiple-empty-lines": ["error", { max: 1, maxBOF: 0, maxEOF: 0 }],
+    "no-restricted-syntax": ["error", "LabeledStatement"],
+    "no-self-assign": "error",
+    "no-sequences": 0,
+    "no-undef": "error",
+    "no-unused-labels": "error",
+    "no-unexpected-multiline": "error",
+    "no-unreachable": "warn",
+    "no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_|req|res|next|args|ctx|__",
+        varsIgnorePattern: "^_|req|res|next|args|ctx|__",
+      },
+    ],
+    "no-use-before-define": "error",
+    "no-var": "error",
+    "object-shorthand": ["error", "always"],
+    "prefer-const": [
+      "error",
+      { destructuring: "all", ignoreReadBeforeAssign: true },
+    ],
+    semi: "error",
+    "space-before-function-paren": [
+      "error",
+      {
+        anonymous: "always",
+        named: "never",
+        asyncArrow: "always",
+      },
+    ],
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        line: {
+          markers: ["!", "?", "*"],
+          exceptions: ["-", "*"],
+        },
+        block: {
+          markers: ["!", "?", "*"],
+          exceptions: ["-", "*"],
+          balanced: true,
+        },
+      },
+    ],
     quotes: [
-      'error',
-      'single',
+      "error",
+      "double",
       {
         avoidEscape: true,
       },
