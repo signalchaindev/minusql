@@ -79,6 +79,7 @@ module.exports = {
       {
         js: "always",
         ts: "never", // Should be set to always. Prevented by Typescript error.
+        ignorePackages: true,
       },
     ],
     "import/first": "error",

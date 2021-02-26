@@ -1,3 +1,3 @@
 export function testConnection() {
-  return 'Successfully tested the connection!'
+  return "API is Connected!"
 }

@@ -1,5 +1,5 @@
-import todos from '../../../database/todos.js'
-import { getTodoById } from '../query/getTodoById.js'
+import todos from "../../../database/todos.js"
+import { getTodoById } from "../query/getTodoById.js"
 
 export function updateTodo(_, args) {
   const { id, todo } = args
@@ -12,5 +12,5 @@ export function updateTodo(_, args) {
 
   todos.set(id, updateTodo)
 
-  return 'Successfully updated todo'
+  return "Successfully updated todo"
 }

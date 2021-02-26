@@ -1,14 +1,13 @@
-import todos from '../../../database/todos.js'
-import generateId from '../../../database/utils/generateId.js'
+import todos from "../../../database/todos.js"
+import generateId from "../../../database/utils/generateId.js"
 
-export function createTodo(_, { input }) {
-  const { todo, completed } = input
+export function createTodo(_, { todo }) {
   const id = generateId()
   const newTodo = {
     id,
     todo,
-    completed,
-    notes: '',
+    completed: false,
+    notes: "",
   }
 
   todos.set(id, newTodo)

@@ -1,4 +1,4 @@
-import todos from '../../../database/todos.js'
+import todos from "../../../database/todos.js"
 
 export function getAllTodos() {
   const entries = []

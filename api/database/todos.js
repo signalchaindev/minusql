@@ -1,25 +1,26 @@
-import generateId from './utils/generateId.js'
+import generateId from "./utils/generateId.js"
 
 const todos = new Map()
+todos.clear()
 
 const seed = [
   {
-    id: '1',
-    todo: 'Test fetch by ID',
+    id: "1",
+    todo: "Test fetch by ID",
     completed: true,
-    description: '',
+    description: "",
   },
   {
     id: generateId(),
-    todo: 'Learn some GraphQL',
+    todo: "Learn some GraphQL",
     completed: false,
-    description: '',
+    description: "",
   },
   {
     id: generateId(),
-    todo: 'Launch awesome app!',
+    todo: "Launch awesome app!",
     completed: false,
-    description: '',
+    description: "",
   },
 ]
 

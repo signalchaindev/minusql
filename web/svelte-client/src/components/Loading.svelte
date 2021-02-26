@@ -1,8 +1,8 @@
 <div class="ellipsis">
-  <div></div>
-  <div></div>
-  <div></div>
-  <div></div>
+  <div />
+  <div />
+  <div />
+  <div />
 </div>
 
 <style>
@@ -19,7 +19,7 @@
     width: 13px;
     height: 13px;
     border-radius: 50%;
-    background: #fff;
+    background: #000031;
     animation-timing-function: cubic-bezier(0, 1, 1, 0);
   }
 
