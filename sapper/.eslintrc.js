@@ -56,6 +56,12 @@ module.exports = {
   settings: {
     "svelte3/ignore-styles": attributes =>
       attributes.lang && attributes.lang.includes("scss"),
+    "import/resolver": {
+      alias: {
+        map: [["@sapper", "./src/node_modules/@sapper"]],
+        extensions: [".js", ".ts", ".svelte"],
+      },
+    },
   },
   rules: {
     // ENV Specific
@@ -104,7 +110,7 @@ module.exports = {
     "import/no-named-as-default": "error",
     "import/no-named-default": "error",
     "import/no-self-import": "error",
-    "import/no-unresolved": "error",
+    "import/no-unresolved": [2, { ignore: ["@sapper"] }],
     "import/no-unused-modules": "error",
     "import/no-useless-path-segments": "error",
     "import/order": "error",

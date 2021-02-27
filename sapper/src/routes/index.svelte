@@ -1,28 +1,43 @@
 <script context="module">
-  // import { client } from "../graphql.js"
-  // import { GET_ALL_TODOS_QUERY } from "../components/getAllTodos.js"
+  import { client, gql } from "../graphql.js"
 
-  // export async function preload() {
-  //   const [data, error] = await client.query(GET_ALL_TODOS_QUERY)
-  //   if (error) {
-  //     console.log("Error:", error)
-  //     return
-  //   }
+  const CMS_QUERY = gql`
+    query CMS_QUERY {
+      homePage {
+        title
+      }
+    }
+  `
 
-  //   const todos = data && data.getAllTodos
+  export async function preload() {
+    const [data, error] = await client.query(CMS_QUERY)
+    if (error) {
+      return {
+        title: data?.homePage?.title || null,
+        error: null,
+      }
+    }
 
-  //   return { todos }
-  // }
+    return {
+      title: data?.homePage?.title,
+      error: null,
+    }
+  }
 </script>
 
 <script>
   import InputForm from "../components/InputForm.svelte"
   import TodoList from "../components/TodoList.svelte"
+  import { ErrorStore } from "../stores/store_Errors.js"
 
-  // export let todos
+  export let title
+  export let error
+
+  if (error) {
+    ErrorStore.set(error)
+  }
 </script>
 
-<h1>My Todos</h1>
+<h1>{title}</h1>
 <InputForm />
-<!-- <TodoList {todos} /> -->
 <TodoList />

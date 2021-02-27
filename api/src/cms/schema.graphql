@@ -1,0 +1,13 @@
+type Query {
+  homePage: HomePageFields!
+  nav: [NavField!]!
+}
+
+type HomePageFields {
+  title: String!
+}
+
+type NavField {
+  link: String!
+  text: String!
+}

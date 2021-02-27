@@ -1,12 +1,15 @@
+<script>
+  export let nav
+</script>
+
 <header>
   <nav>
     <ul>
-      <li>
-        <a href=".">Home</a>
-      </li>
-      <li>
-        <a href="handle-errors">errors</a>
-      </li>
+      {#each nav as n}
+        <li>
+          <a href={n.link}>{n.text}</a>
+        </li>
+      {/each}
     </ul>
   </nav>
 </header>
