@@ -15,7 +15,6 @@
 
   async function queryError() {
     const [data, error] = await client.query(HANDLE_ERRORS_QUERY)
-
     if (error) {
       ErrorStore.set(error)
       return

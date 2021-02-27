@@ -1,6 +1,6 @@
 import { writable } from "svelte/store"
-import { parseGQLString } from "minusql"
 import { client } from "./graphql.js"
+import { parseGQLString } from "minusql"
 
 /**
  * Cache Store - Set Cache
@@ -27,7 +27,7 @@ export async function useQuery(operation, opts) {
     return [null, error]
   }
   const [_, operationName] = parseGQLString(operation)
-  cache.set(operationName, data?.[operationName])
+  cache?.set(operationName, data?.[operationName])
   return [data, null]
 }
 
@@ -42,21 +42,23 @@ export async function useMutation(operation, opts) {
 
   if (opts?.updateQuery) {
     const [_, operationName] = parseGQLString(operation)
-    let rs
-    let cacheValues
-
-    cache.subscribe(v => {
-      cacheValues = v
+    let cachedData
+    cache?.subscribe(v => {
+      cachedData = v
     })
 
     if (data?.[operationName].constructor === Array) {
-      rs = [...cacheValues?.[opts.updateQuery], ...data?.[operationName]]
-      cache.set(opts.updateQuery, rs)
+      cache?.set(opts.updateQuery, [
+        ...cachedData?.[opts.updateQuery],
+        ...data?.[operationName],
+      ])
       return [data, null]
     }
 
-    rs = [...cacheValues?.[opts.updateQuery], data?.[operationName]]
-    cache.set(opts.updateQuery, rs)
+    cache?.set(opts.updateQuery, [
+      ...cachedData?.[opts.updateQuery],
+      data?.[operationName],
+    ])
     return [data, null]
   }
 

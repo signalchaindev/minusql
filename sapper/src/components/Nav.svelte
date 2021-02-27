@@ -5,11 +5,13 @@
 <header>
   <nav>
     <ul>
-      {#each nav as n}
-        <li>
-          <a href={n.link}>{n.text}</a>
-        </li>
-      {/each}
+      {#if nav}
+        {#each nav as n}
+          <li>
+            <a href={n.link}>{n.text}</a>
+          </li>
+        {/each}
+      {/if}
     </ul>
   </nav>
 </header>

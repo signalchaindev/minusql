@@ -1,5 +1,5 @@
 <script context="module">
-  import { client, gql } from "../graphql.js"
+  import { gql } from "../graphql.js"
   import { cache, useQuery } from "../cache.js"
 
   const CMS_QUERY = gql`
@@ -19,10 +19,6 @@
         error: null,
       }
     }
-
-    cache.subscribe(v => {
-      console.log(v)
-    })
 
     return {
       nav: data?.nav,
