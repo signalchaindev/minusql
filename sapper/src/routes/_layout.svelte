@@ -1,10 +1,8 @@
 <script>
   import { onMount } from "svelte"
   import Nav from "../components/Nav.svelte"
-  import { client, gql } from "../graphql.js"
-  import { cache } from "../components/cache.js"
-
-  $: console.log("LO cache:", $cache)
+  import { gql } from "../graphql.js"
+  import { cache, useQuery } from "../cache.js"
 
   export let segment
   if (segment) {
@@ -18,12 +16,10 @@
   `
 
   onMount(async () => {
-    const [data, error] = await client.query(TEST_CONNECTION_QUERY)
+    const [_, error] = await useQuery(TEST_CONNECTION_QUERY)
     if (error) {
-      console.log("Error:", error)
+      console.error("Error:", error)
     }
-
-    cache.set("testConnection", data?.testConnection)
   })
 </script>
 

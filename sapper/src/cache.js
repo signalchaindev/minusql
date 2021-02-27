@@ -1,6 +1,6 @@
 import { writable } from "svelte/store"
 import { parseGQLString } from "minusql"
-import { client } from "../graphql.js"
+import { client } from "./graphql.js"
 
 /**
  * Cache Store - Set Cache
@@ -34,22 +34,31 @@ export async function useQuery(operation, opts) {
 /**
  * User Mutation
  */
-export async function mutation(operation, opts) {
+export async function useMutation(operation, opts) {
   const [data, error] = await client.mutation(operation, opts)
   if (error) {
     return [null, error]
   }
-  if (opts?.refetchQuery) {
+
+  if (opts?.updateQuery) {
     const [_, operationName] = parseGQLString(operation)
     let rs
+    let cacheValues
+
+    cache.subscribe(v => {
+      cacheValues = v
+    })
+
     if (data?.[operationName].constructor === Array) {
-      rs = [...cache?.[opts.refetchQuery], ...data?.[operationName]]
-      cache.set(opts.refetchQuery, rs)
+      rs = [...cacheValues?.[opts.updateQuery], ...data?.[operationName]]
+      cache.set(opts.updateQuery, rs)
       return [data, null]
     }
-    rs = [...cache?.[opts.refetchQuery], data?.[operationName]]
-    cache.set(opts.refetchQuery, rs)
+
+    rs = [...cacheValues?.[opts.updateQuery], data?.[operationName]]
+    cache.set(opts.updateQuery, rs)
     return [data, null]
   }
+
   return [data, null]
 }

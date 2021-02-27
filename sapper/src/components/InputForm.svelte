@@ -1,8 +1,6 @@
 <script>
-  import { client, gql } from "../graphql.js"
-  import { cache } from "./cache.js"
-
-  $: console.log("IF cache:", $cache)
+  import { gql } from "../graphql.js"
+  import { useMutation } from "../cache.js"
 
   let value = ""
 
@@ -17,17 +15,17 @@
   `
 
   async function createTodo() {
-    const [data, error] = await client.mutation(CREATE_TODO_MUTATION, {
+    const [_, error] = await useMutation(CREATE_TODO_MUTATION, {
       variables: {
         todo: value,
       },
+      updateQuery: "getAllTodos",
     })
     if (error) {
       console.error(error)
       return
     }
 
-    cache.set("getAllTodos", [...$cache.getAllTodos, data?.createTodo])
     value = ""
   }
 </script>

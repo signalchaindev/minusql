@@ -3,9 +3,7 @@
   import { gql } from "../graphql.js"
   import Todo from "./Todo.svelte"
   import Loading from "./Loading.svelte"
-  import { cache, useQuery } from "./cache.js"
-
-  $: console.log("TL cache:", $cache)
+  import { cache, useQuery } from "../cache.js"
 
   let loading = true
 
@@ -22,7 +20,7 @@
   onMount(async () => {
     const [_, error] = await useQuery(GET_ALL_TODOS_QUERY)
     if (error) {
-      console.log("Error:", error)
+      console.error("Error:", error)
     }
 
     loading = false
@@ -31,7 +29,7 @@
 
 {#if loading}
   <Loading />
-{:else}
+{:else if $cache}
   <ul>
     {#each $cache.getAllTodos as todo}
       <Todo {todo} />
