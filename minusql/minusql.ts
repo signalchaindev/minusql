@@ -191,6 +191,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
   options: FetchHandlerOptions,
 ): Promise<MinusQLReturn> {
   try {
+    // Cache stuff
     // //-------------------------------------------
     const [operationType, operationName] = parseGQLString(operation)
     const isQuery = operationType === "query"
@@ -202,6 +203,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
       data: null,
     }
 
+    // console.warn("-----------PRE-CACHE-----------")
     // If there is data in the cache, return that data
     const [cacheData, err] = await preFetchHandler(initCacheData)
     if (err) {
@@ -228,7 +230,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
       ...this.requestOptions,
     }
 
-    console.warn("-----------I'M FETCHING!-----------")
+    // console.warn("-----------FETCH-----------")
     const res = await fetch(this.uri, requestObject)
     if (res.ok !== true) {
       console.error(`${res.status} ${res.statusText}`)
@@ -278,8 +280,9 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
       ]
     }
 
+    // Cache stuff
     // //-------------------------------------------
-    console.log("BEFORE SET CACHE")
+    // console.log("BEFORE SET CACHE", cacheStore)
     // Set data in cache
     if (isQuery || options?.updateQuery) {
       await this.cache({
@@ -288,7 +291,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
         updateQuery: options?.updateQuery,
       })
     }
-    console.log("AFTER SET CACHE")
+    // console.log("AFTER SET CACHE", cacheStore)
     // //-------------------------------------------
 
     return [resJson.data, null]
@@ -312,12 +315,8 @@ async function preFetchHandler(initCacheData: InitCacheData) {
     const keyIsCached = cacheStore.has(cacheKey)
 
     if (keyIsCached) {
-      return [
-        {
-          [`${initCacheData.operationName}`]: cacheStore.get(cacheKey),
-        },
-        null,
-      ]
+      // console.log("*****PRE*****", cacheStore.get(cacheKey))
+      return [cacheStore.get(cacheKey), null]
     }
 
     return [null, null]
@@ -325,6 +324,7 @@ async function preFetchHandler(initCacheData: InitCacheData) {
     return [null, err]
   }
 }
+
 /**
  * Cache handler method
  */
@@ -355,20 +355,20 @@ MinusQL.prototype.cache = async function cache(initCacheData: CacheInput) {
   if (keyIsCached && updateQuery) {
     const cachedData = cacheStore.get(cacheKey)
 
-    //! here's a bug - on the second todo entry this fails
-    console.log("***cachedData***:", cachedData)
-    console.log("***data***:", data)
-
     if (data?.[operationName].constructor === Array) {
-      cacheStore.set(cacheKey, [
-        ...cachedData?.[cacheKey],
-        ...data?.[operationName],
-      ])
-      console.log("\nUPDATE_CACHE:", cacheStore, "\n\n")
+      cacheStore.set(cacheKey, {
+        [`${updateQuery}`]: [
+          ...cachedData?.[cacheKey],
+          ...data?.[operationName],
+        ],
+      })
+      console.log("\nUPDATE_CACHE (ARRAY):", cacheStore, "\n\n")
       return // eslint-disable-line
     }
 
-    cacheStore.set(cacheKey, [...cachedData?.[cacheKey], data?.[operationName]])
+    cacheStore.set(cacheKey, {
+      [`${updateQuery}`]: [...cachedData?.[cacheKey], data?.[operationName]],
+    })
 
     console.log("\nUPDATE_CACHE:", cacheStore, "\n\n")
     return // eslint-disable-line
