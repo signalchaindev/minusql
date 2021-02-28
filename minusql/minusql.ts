@@ -1,4 +1,4 @@
-import fetch from "./utils/isoFetch.js"
+import fetch from "./utils/isoFetch" // .ts
 import { parseGQLString } from "./utils/parseGQLString" // .ts
 import { generateCacheKey } from "./utils/generateCacheKey" // .ts
 import { isEmpty } from "./utils/isEmpty" // .ts
@@ -351,11 +351,13 @@ MinusQL.prototype.cache = async function cache(initCacheData: CacheInput) {
     console.log("\nSET CACHE:", cacheStore, "\n\n")
     return // eslint-disable-line
   }
+
   if (keyIsCached && updateQuery) {
     const cachedData = cacheStore.get(cacheKey)
 
-    //! here's a bug - one the second todo entry this fails
+    //! here's a bug - on the second todo entry this fails
     console.log("***cachedData***:", cachedData)
+    console.log("***data***:", data)
 
     if (data?.[operationName].constructor === Array) {
       cacheStore.set(cacheKey, [

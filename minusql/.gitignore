@@ -1,2 +1,4 @@
 node_modules
-dist
+**/*.map
+index.js
+index.es.js

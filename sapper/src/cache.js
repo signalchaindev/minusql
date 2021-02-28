@@ -1,6 +1,6 @@
 import { writable } from "svelte/store"
 import { client } from "./graphql.js"
-import { parseGQLString } from "minusql"
+import { parseGQLString } from "minusql/utils/parseGQLString.js"
 
 /**
  * Cache Store - Set Cache

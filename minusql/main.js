@@ -1,3 +1,2 @@
-export * from "./src/minusql" // .ts
-export * from "./src/gql" // .ts
-export * from "./src/utils/parseGQLString" // .ts
+export * from "./minusql.ts"
+export * from "./gql.ts"

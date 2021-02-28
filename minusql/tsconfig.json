@@ -18,6 +18,6 @@
     "target": "es2019",
     "outDir": "dist"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["main.js", "minusql.ts", "gql.ts", "interfaces.ts", "utils"],
+  "exclude": ["node_modules"]
 }
