@@ -10,7 +10,7 @@ import multiInput from "rollup-plugin-multi-input"
 const pkg = JSON.parse(
   fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"),
 )
-if (Object.keys(pkg).length < 1) {
+if (Object.keys(pkg).length === 0) {
   console.error("Failed to parse package.json")
 }
 
@@ -18,9 +18,8 @@ const production = !process.env.ROLLUP_WATCH
 
 const tsOptions = {
   check: !!process.env.TS_CHECK_ENABLED,
-  tsconfigOverride: {
-    compilerOptions: { module: "esnext" },
-  },
+  tsconfig: "tsconfig.json",
+  useTsconfigDeclarationDir: true,
 }
 
 const config = {
@@ -48,16 +47,19 @@ const config = {
     clearScreen: false,
     exclude: [
       "node_modules",
+      "typings",
       "utils/**/*.js",
       "index.js",
       "index.es.js",
       "**/*.map",
+      "**/*.d.ts",
     ],
   },
 }
+
 export default [
   {
-    input: "./main.js",
+    input: "./main.ts",
     output: [
       { file: pkg.main, format: "cjs", sourcemap: true, exports: "named" },
       { file: pkg.module, format: "esm", sourcemap: true, exports: "named" },
@@ -65,7 +67,7 @@ export default [
     ...config,
   },
   {
-    input: "utils/**/*.ts",
+    input: ["utils/**/*.ts", "!utils/**/*.d.ts"],
     output: {
       dir: ".",
       format: "esm",

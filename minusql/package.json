@@ -5,6 +5,7 @@
   "license": "MIT",
   "main": "./index.js",
   "module": "./index.es.js",
+  "types": "./typings/**/*",
   "description": "A GraphQL client library for fetching & caching data.",
   "keywords": [
     "graphql",
