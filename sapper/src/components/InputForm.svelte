@@ -1,6 +1,7 @@
 <script>
   import { gql } from "../graphql.js"
   import { useMutation } from "../cache.js"
+  import { ErrorStore } from "../stores/store_Errors.js"
 
   let value = ""
 
@@ -22,7 +23,7 @@
       updateQuery: "getAllTodos",
     })
     if (error) {
-      console.error(error)
+      ErrorStore.set(error)
       return
     }
 
@@ -32,7 +33,7 @@
 
 <form on:submit|preventDefault={createTodo}>
   <label for="todo-input">
-    <span>Add todo:</span>
+    <span>Add Todo:</span>
     <input
       id="todo-input"
       type="text"
@@ -46,13 +47,12 @@
 <style>
   form {
     max-width: 500px;
-    margin: 0 auto;
+    margin: 24px auto;
     display: flex;
   }
 
   label {
     display: block;
-    text-align: center;
   }
 
   label > span {
@@ -61,6 +61,7 @@
   }
 
   label > input {
+    display: block;
     margin: 8px auto 0;
     max-width: 100%;
   }

@@ -14,7 +14,7 @@
   async function updateTodo() {
     completed = !completed
 
-    const { data, error } = await client.mutation(UPDATE_TODO_MUTATION, {
+    const [data, error] = await client.mutation(UPDATE_TODO_MUTATION, {
       variables: {
         id: todo.id,
         todo: {
@@ -44,7 +44,7 @@
     <span>{todo.todo}</span>
   </label>
   &nbsp
-  <a href={`todo/${todo.id}`} rel="prefetch">notes</a>
+  <a href={`todo/${todo.id}`} sapper:prefetch>notes</a>
 </li>
 
 <style>

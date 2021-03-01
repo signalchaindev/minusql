@@ -1,6 +1,6 @@
 <script context="module">
   import { gql } from "../graphql.js"
-  import { cache, useQuery } from "../cache.js"
+  import { useQuery } from "../cache.js"
 
   const CMS_QUERY = gql`
     query CMS_QUERY {
@@ -33,14 +33,8 @@
   import ErrorToast from "../components/lib/Toast_Error.svelte"
   import { ErrorStore } from "../stores/store_Errors.js"
 
-  // $: console.log("cache:", $cache)
-
   export let nav
   export let error
-  export let segment
-  if (segment) {
-    // noop
-  }
 
   if (error) {
     ErrorStore.set(error)
@@ -63,10 +57,6 @@
 <Nav {nav} />
 
 <main>
-  <section>
-    <p>{$cache?.testConnection || "Loading..."}</p>
-  </section>
-
   <slot />
 </main>
 

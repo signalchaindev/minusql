@@ -19,12 +19,15 @@ body {
   font-family: sans-serif;
 }
 
+section {
+	padding-top: 32px;
+	padding-bottom: 32px;
+}
+
 h1 {
   font-size: 32px;
   font-weight: 300;
   margin: 0 0 8px;
-  text-align: center;
-  text-transform: uppercase;
 }
 
 ul {

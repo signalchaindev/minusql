@@ -38,6 +38,14 @@
   }
 </script>
 
-<h1>{title}</h1>
-<InputForm />
-<TodoList />
+<section>
+  <h1>{title}</h1>
+  <InputForm />
+  <TodoList />
+</section>
+
+<style>
+  h1 {
+    text-align: center;
+  }
+</style>

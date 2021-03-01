@@ -1,4 +1,6 @@
 <script>
+  import { cache } from "../cache.js"
+
   export let nav
 </script>
 
@@ -8,19 +10,34 @@
       {#if nav}
         {#each nav as n}
           <li>
-            <a href={n.link}>{n.text}</a>
+            <a href={n.link} sapper:prefetch>{n.text}</a>
           </li>
         {/each}
       {/if}
     </ul>
   </nav>
+
+  <p>{$cache?.testConnection || "Loading..."}</p>
 </header>
 
 <style>
   header {
+    position: relative;
     background: #eee;
     font-size: 16px;
     text-transform: uppercase;
+  }
+
+  nav {
+    display: flex;
+    justify-content: center;
+  }
+
+  ul {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
   }
 
   a {
@@ -33,9 +50,10 @@
     background: #fff;
   }
 
-  ul {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  p {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
   }
 </style>
