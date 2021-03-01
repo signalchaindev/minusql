@@ -1,0 +1,301 @@
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  margin: 0px;
+  padding: 0px;
+  margin-block-end: 0px;
+  margin-block-start: 0px;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+section {
+	padding-top: 32px;
+	padding-bottom: 32px;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 300;
+  margin: 0 0 8px;
+}
+
+ul {
+  padding: 0px;
+}
+
+li {
+  list-style-type: none;
+}
+
+input {
+  font-size: 16px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+button {
+  cursor: pointer;
+  font-weight: bolder;
+  height: 36px;
+}
+
+a {
+  color: inherit;
+}
+
+
+/* VARS */
+:root {
+	--white: #FBFCFE;
+	--black: #030303;
+	--shiny-black: #00001f;
+	--n_l_gray: #e0e5ec;
+	--n_m_gray: #515f71;
+	--n_m_blue: #3f498c;
+	--neutral-gray50: #FCFCFD;
+	--neutral-gray100: #E1E5EA;
+	--neutral-gray200: #CCD0D6;
+	--neutral-gray300: #B5B9C0;
+	--neutral-gray400: #989EA7;
+	--neutral-gray500: #7B838F;
+	--neutral-gray600: #626873;
+	--neutral-gray700: #4A4E56;
+	--neutral-gray800: #31343A;
+	--neutral-gray900: #31343A;
+	--gray50: #FCFCFD;
+	--gray100: #E1E5EA;
+	--gray200: #CCD0D6;
+	--gray300: #B2B8C1;
+	--gray400: #99A1AD;
+	--gray500: #7F8998;
+	--gray600: #687280;
+	--gray700: #515B69;
+	--gray800: #282D34;
+	--gray900: #15171A;
+	--blue-gray50: #F7F9FD;
+	--blue-gray100: #DBE4F1;
+	--blue-gray200: #C0CCDD;
+	--blue-gray300: #9AA6BC;
+	--blue-gray400: #8289A1;
+	--blue-gray500: #686D87;
+	--blue-gray600: #51546C;
+	--blue-gray700: #2F344B;
+	--blue-gray800: #25293C;
+	--blue-gray900: #161C2E;
+	--blue50: #F3FAFF;
+	--blue100: #D1E9FF;
+	--blue200: #9BC6FF;
+	--blue300: #71A1FA;
+	--blue400: #6181ED;
+	--blue500: #4D5DD1;
+	--blue600: #3643A1;
+	--blue700: #2A357F;
+	--blue800: #1F275A;
+	--blue900: #121C3B;
+	--cyan50: #EBFBFD;
+	--cyan100: #BDEFFC;
+	--cyan200: #73CCEB;
+	--cyan300: #44ADE4;
+	--cyan400: #338CCF;
+	--cyan500: #086EB1;
+	--cyan600: #054D8B;
+	--cyan700: #033D6C;
+	--cyan800: #092C49;
+	--cyan900: #041E30;
+	--green50: #EEFEEB;
+	--green100: #C5F1C3;
+	--green200: #79D28B;
+	--green300: #2CB975;
+	--green400: #1B9C69;
+	--green500: #0C7654;
+	--green600: #0F573C;
+	--green700: #0B4235;
+	--green800: #0A302F;
+	--green900: #062024;
+	--yellow50: #FFFEEB;
+	--yellow100: #FFF5B8;
+	--yellow200: #FFE174;
+	--yellow300: #FFD761;
+	--yellow400: #FFCD38;
+	--yellow500: #EBA800;
+	--yellow600: #C9841C;
+	--yellow700: #935A10;
+	--yellow800: #4E3113;
+	--yellow900: #261F08;
+	--burnt50: #FBF7E7;
+	--burnt100: #F8E0B0;
+	--burnt200: #F1B86F;
+	--burnt300: #E48D37;
+	--burnt400: #D46D16;
+	--burnt500: #B24A01;
+	--burnt600: #8E2F01;
+	--burnt700: #6B250C;
+	--burnt800: #4E1C0D;
+	--burnt900: #321408;
+	--orange50: #FFF9EB;
+	--orange100: #FFDEBA;
+	--orange200: #F8AE7A;
+	--orange300: #F48653;
+	--orange400: #E36341;
+	--orange500: #BC422F;
+	--orange600: #942824;
+	--orange700: #741B21;
+	--orange800: #53141A;
+	--orange900: #3A0F13;
+	--red50: #FFF5F5;
+	--red100: #FECDCD;
+	--red200: #FDA5A5;
+	--red300: #F56565;
+	--red400: #E43939;
+	--red500: #CC2424;
+	--red600: #A21111;
+	--red700: #751414;
+	--red800: #551111;
+	--red900: #3B0512;
+	--magenta50: #FFF3F7;
+	--magenta100: #FFD1E1;
+	--magenta200: #FEAFCA;
+	--magenta300: #F47EA7;
+	--magenta400: #EA5587;
+	--magenta500: #C73459;
+	--magenta600: #9B1946;
+	--magenta700: #751439;
+	--magenta800: #551134;
+	--magenta900: #3B0525;
+	--purple50: #FFF6FF;
+	--purple100: #FCDBF6;
+	--purple200: #EEAAE2;
+	--purple300: #DF82D8;
+	--purple400: #C361CB;
+	--purple500: #9A46AD;
+	--purple600: #71308E;
+	--purple700: #522577;
+	--purple800: #381A5F;
+	--purple900: #280F4A;
+	--violet50: #F7F8FF;
+	--violet100: #E3E2FD;
+	--violet200: #C0BBE8;
+	--violet300: #A895DE;
+	--violet400: #9275D6;
+	--violet500: #7955BC;
+	--violet600: #573E92;
+	--violet700: #422D77;
+	--violet800: #30205B;
+	--violet900: #1D1646;
+}
+
+:root {
+	--inset: inset 0 7px 9px -7px rgba(0,0,0,0.7);;
+	--el1: 0 1px 3px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.24);;
+	--el2: 0 3px 6px rgba(0,0,0,0.16), 0 4px 8px rgba(0,0,0,0.23);;
+	--el3: 0 10px 20px rgba(0,0,0,0.25), 0 6px 10px rgba(0,0,0,0.20);;
+	--el4: 0 14px 28px rgba(0,0,0,0.25), 0 12px 12px rgba(0,0,0,0.22);;
+	--el5: 0 19px 38px rgba(0,0,0,0.30), 0 16px 14px rgba(0,0,0,0.22);;
+	--el6: 0 19px 38px rgba(0,0,0,0.25), 0 16px 14px rgba(0,0,0,0.16);
+}
+
+:root {
+	--rad1: 2px;
+	--rad2: 4px;
+	--rad3: 6px;
+	--rad4: 8px;
+	--rad5: 10px;
+	--rad6: 12px;
+	--rad7: 16px;
+	--rad8: 18px;
+	--rad: 20px;
+}
+
+:root {
+	--size1: 8px;
+	--size2: 10px;
+	--size3: 12px;
+	--size4: 14px;
+	--size5: 16px;
+	--size6: 18px;
+	--size7: 20px;
+	--size8: 24px;
+	--size9: 28px;
+	--size10: 32px;
+	--size11: 36px;
+	--size12: 40px;
+	--size13: 48px;
+	--size14: 56px;
+	--size15: 64px;
+	--size16: 72px;
+	--size17: 96px;
+}
+
+:root {
+	--sp1: 1px;
+	--sp2: 2px;
+	--sp3: 4px;
+	--sp4: 6px;
+	--sp5: 8px;
+	--sp6: 10px;
+	--sp7: 12px;
+	--sp8: 16px;
+	--sp9: 20px;
+	--sp10: 24px;
+	--sp11: 28px;
+	--sp12: 32px;
+	--sp13: 36px;
+	--sp14: 40px;
+	--sp15: 48px;
+	--sp16: 56px;
+	--sp17: 64px;
+	--sp18: 72px;
+	--sp19: 80px;
+	--sp20: 96px;
+	--sp21: 128px;
+	--sp22: 160px;
+	--sp23: 192px;
+	--sp24: 224px;
+	--sp25: 256px;
+	--sp26: 384px;
+	--sp27: 512px;
+	--sp28: 640px;
+	--sp29: 768px;
+	--sp30: 896px;
+	--sp31: 960px;
+	--sp32: 1024px;
+}
+
+:root {
+	--root-size: 16px;
+	--nav-height: 90px;
+	--hh-nav-height: 52px;
+	--scrollbar-width: 12px;
+	--display: Montserrat, sans-serif;
+	--body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	--mono: menlo, inconsolata, monospace;
+	--primary: #3643A1;
+	--secondary: #FBFCFE;
+	--ds-text: #3643A1;
+	--ds-text_i: #FBFCFE;
+	--text: #282D34;
+	--lt-text: #515B69;
+	--dk-text: #15171A;
+	--text_i: #FBFCFE;
+	--ac-text: #338CCF;
+	--hover: #4D5DD1;
+	--hover_i: #FBFCFE;
+	--active: #6181ED;
+	--active_i: #FBFCFE;
+	--bg: #FBFCFE;
+	--bg_i: #25293C;
+	--focus-ring: 0 0 0 2px #73CCEB;
+	--focus-ring_i: 0 0 0 2px #1B9C69;
+}
