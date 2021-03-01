@@ -4,6 +4,8 @@ import { generateCacheKey } from "./utils/generateCacheKey" // .ts
 import { isEmpty } from "./utils/isEmpty" // .ts
 import { InitCacheData } from "./interfaces" // .ts
 
+type FetchPolicy = "cache" | "no-cache"
+
 type RequestMethod = "POST"
 
 interface RequestHeaders {
@@ -32,9 +34,9 @@ interface RequestObject {
   cache: RequestCache
   [key: string]: any
 }
-
 interface MinusQLInput {
   uri: string
+  fetchPolicy?: FetchPolicy
   credentials?: string
   headers?: RequestHeaders
   requestOptions?: Object
@@ -45,19 +47,20 @@ type MinusQLReturn = [Object | null, Error | null]
 /**
  * The cache
  */
-const cacheStore = new Map()
+const STORE = new Map()
 
 /**
  * Create a MinusQL instance
  */
 export function MinusQL(
   this: MinusQLInput,
-  { uri, credentials, headers, requestOptions }: MinusQLInput,
+  { uri, fetchPolicy, credentials, headers, requestOptions }: MinusQLInput,
 ): void {
   this.uri = uri
+  this.fetchPolicy = fetchPolicy || "cache"
+  this.credentials = credentials
   this.headers = headers
   this.requestOptions = requestOptions
-  this.credentials = credentials
 }
 
 /**
@@ -66,16 +69,17 @@ export function MinusQL(
 type Operation = string // gql query string
 interface QueryInput {
   variables?: Object
+  fetchPolicy?: FetchPolicy
   headers?: RequestHeaders // additional headers (refer to fetch api)
   requestOptions?: Object // additional options to fetch request (refer to fetch api)
 }
 
-MinusQL.prototype.query = function query(
-  operation: Operation,
-  options: QueryInput,
-): Promise<MinusQLReturn> | MinusQLReturn {
+MinusQL.prototype.query = async function query(
+  op: Operation,
+  opts: QueryInput,
+): Promise<MinusQLReturn> {
   try {
-    if (!operation) {
+    if (!op) {
       return [
         null,
         {
@@ -84,7 +88,7 @@ MinusQL.prototype.query = function query(
         },
       ]
     }
-    if (operation.constructor !== String) {
+    if (op.constructor !== String) {
       return [
         null,
         {
@@ -94,7 +98,7 @@ MinusQL.prototype.query = function query(
         },
       ]
     }
-    return this.aggregateResolvers(operation, options)
+    return this.fetchHandler(op, opts)
   } catch (err) {
     return [null, { name: "MinusQL error #23675434", message: `${err}` }]
   }
@@ -110,12 +114,12 @@ interface MutationInput {
   updateQuery?: string
 }
 
-MinusQL.prototype.mutation = function mutation(
-  operation: Operation,
-  options: MutationInput,
-): Promise<MinusQLReturn> | MinusQLReturn {
+MinusQL.prototype.mutation = async function mutation(
+  op: Operation,
+  opts: MutationInput,
+): Promise<MinusQLReturn> {
   try {
-    if (!operation) {
+    if (!op) {
       return [
         null,
         {
@@ -124,7 +128,7 @@ MinusQL.prototype.mutation = function mutation(
         },
       ]
     }
-    if (operation.constructor !== String) {
+    if (op.constructor !== String) {
       return [
         null,
         {
@@ -134,27 +138,35 @@ MinusQL.prototype.mutation = function mutation(
         },
       ]
     }
-    return this.aggregateResolvers(operation, options)
+    // @ts-expect-error
+    opts?.fetchPolicy = opts?.updateQuery ? "cache" : "no-cache"
+    return this.fetchHandler(op, opts)
   } catch (err) {
     return [null, { name: "MinusQL error #43482367", message: `${err}` }]
   }
 }
 
 /**
- * Aggregate Resolvers method
+ * Fetch handler
  */
-interface AggregateResolveOptions {
-  variables: Object
+interface FetchHandlerOptions {
+  operation: string // gql query string
+  variables: Object // resolver variables
+  fetchPolicy?: FetchPolicy
   headers?: RequestHeaders // additional headers (refer to fetch api)
   requestOptions?: Object // additional options to fetch request (refer to fetch api)
   updateQuery?: string
+  // deleteCacheItem?: Object
 }
 
-MinusQL.prototype.aggregateResolvers = async function aggregateResolvers(
-  operation: Operation,
-  options: AggregateResolveOptions,
+MinusQL.prototype.fetchHandler = async function fetchHandler(
+  operation,
+  options: FetchHandlerOptions,
 ): Promise<MinusQLReturn> {
   try {
+    if (options?.fetchPolicy) {
+      this.fetchPolicy = options?.fetchPolicy
+    }
     if (options?.headers) {
       this.headers = { ...this.headers, ...options.headers }
     }
@@ -165,52 +177,27 @@ MinusQL.prototype.aggregateResolvers = async function aggregateResolvers(
       }
     }
 
-    const [data, error] = await this.fetchHandler(operation, options)
-    if (error !== null) {
-      return [null, error]
-    }
-    return [data, null]
-  } catch (err) {
-    return [null, { name: "MinusQL error #75382890", message: `${err}` }]
-  }
-}
-
-/**
- * Fetch handler
- */
-interface FetchHandlerOptions {
-  operation: string // gql query string
-  variables: Object // resolver variables
-  updateQuery?: string
-  // refetchQuery?: Object
-  // deleteItem?: Object
-}
-
-MinusQL.prototype.fetchHandler = async function fetchHandler(
-  operation,
-  options: FetchHandlerOptions,
-): Promise<MinusQLReturn> {
-  try {
     // Cache stuff
     // //-------------------------------------------
-    const [operationType, operationName] = parseGQLString(operation)
-    const isQuery = operationType === "query"
-    const isMutation = operationType === "mutation"
+    let operationName
+    if (this.fetchPolicy === "cache" || options?.updateQuery) {
+      const [opType, opName] = parseGQLString(operation)
+      operationName = opName
 
-    const initCacheData: InitCacheData = {
-      operationName,
-      isMutation,
-      data: null,
-    }
+      const initCache: InitCacheData = {
+        operationName: opName,
+        isMutation: opType === "mutation",
+        data: null,
+      }
 
-    // console.warn("-----------PRE-CACHE-----------")
-    // If there is data in the cache, return that data
-    const [cacheData, err] = await preFetchHandler(initCacheData)
-    if (err) {
-      console.error(err)
-    }
-    if (!isEmpty(cacheData)) {
-      return [cacheData, null]
+      // If there is data in the cache, return that data
+      const [cacheData, err] = await preFetch(initCache)
+      if (err) {
+        console.error(err)
+      }
+      if (!isEmpty(cacheData)) {
+        return [cacheData, null]
+      }
     }
     // //-------------------------------------------
 
@@ -230,10 +217,10 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
       ...this.requestOptions,
     }
 
-    // console.warn("-----------FETCH-----------")
-    const res = await fetch(this.uri, requestObject)
-    if (res.ok !== true) {
-      console.error(`${res.status} ${res.statusText}`)
+    console.warn("-----------FETCH-----------")
+    const r = await fetch(this.uri, requestObject)
+    if (r.ok !== true) {
+      console.error(`${r.status} ${r.statusText}`)
     }
 
     interface ErrObj {
@@ -246,18 +233,18 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
       data: Object | null
     }
 
-    const resJson: ResJson = await res.json()
+    const res: ResJson = await r.json()
 
-    const fmtErrName = `Operation failed: ${
-      resJson?.errors &&
-      resJson?.errors.length > 0 &&
-      resJson?.errors[0]?.path &&
-      resJson?.errors[0]?.path.length > 0 &&
-      resJson?.errors[0]?.path[0]
-        ? resJson?.errors[0]?.path[0]
+    const errName = `Operation failed: ${
+      res?.errors &&
+      res?.errors.length > 0 &&
+      res?.errors[0]?.path &&
+      res?.errors[0]?.path.length > 0 &&
+      res?.errors[0]?.path[0]
+        ? res?.errors[0]?.path[0]
         : "Invalid query"
     }`
-    const fmtErrMsg = str => {
+    const errMsg = str => {
       try {
         return JSON.parse(str)
       } catch (err) {
@@ -265,16 +252,14 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
       }
     }
 
-    if (resJson?.errors) {
+    if (res?.errors) {
       return [
         null,
         {
-          name: fmtErrName,
+          name: errName,
           message:
-            resJson?.errors &&
-            resJson?.errors.length > 0 &&
-            resJson.errors[0]?.message
-              ? fmtErrMsg(resJson.errors[0]?.message)
+            res?.errors && res?.errors.length > 0 && res.errors[0]?.message
+              ? errMsg(res.errors[0]?.message)
               : "No error message was returned",
         },
       ]
@@ -282,19 +267,19 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
 
     // Cache stuff
     // //-------------------------------------------
-    // console.log("BEFORE SET CACHE", cacheStore)
+    // console.log("BEFORE SET CACHE", STORE)
     // Set data in cache
-    if (isQuery || options?.updateQuery) {
+    if (this.fetchPolicy === "cache" || options?.updateQuery) {
       await this.cache({
         operationName,
-        data: resJson.data,
+        data: res.data,
         updateQuery: options?.updateQuery,
       })
     }
-    // console.log("AFTER SET CACHE", cacheStore)
+    // console.log("AFTER SET CACHE", STORE)
     // //-------------------------------------------
 
-    return [resJson.data, null]
+    return [res.data, null]
   } catch (err) {
     return [null, { name: "MinusQL error #78464281", message: `${err}` }]
   }
@@ -305,19 +290,23 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
  * @private
  */
 
-async function preFetchHandler(initCacheData: InitCacheData) {
+async function preFetch(initCache: InitCacheData) {
+  console.warn("-----------PRE-CACHE-----------")
   try {
-    if (initCacheData.isMutation) {
+    if (initCache.isMutation) {
       return [null, null]
     }
 
-    const cacheKey = generateCacheKey(initCacheData)
-    const keyIsCached = cacheStore.has(cacheKey)
+    const key = generateCacheKey(initCache)
+    const isCached = STORE.has(key)
 
-    if (keyIsCached) {
-      // console.log("*****PRE*****", cacheStore.get(cacheKey))
-      return [cacheStore.get(cacheKey), null]
+    if (isCached) {
+      // console.warn("CACHED DATA", STORE.get(key))
+      console.warn("-----------CACHE DATA EXISTS-----------")
+      return [STORE.get(key), null]
     }
+
+    console.warn("-----------NO CACHE DATA-----------")
 
     return [null, null]
   } catch (err) {
@@ -335,42 +324,39 @@ interface CacheInput {
   updateQuery: string
 }
 
-MinusQL.prototype.cache = async function cache(initCacheData: CacheInput) {
-  const operationName = initCacheData?.operationName
-  const data = initCacheData?.data
-  const updateQuery = initCacheData?.updateQuery
-  const cacheKey = updateQuery || generateCacheKey({ operationName })
+MinusQL.prototype.cache = async function cache(initCache: CacheInput) {
+  const operationName = initCache?.operationName
+  const data = initCache?.data
+  const updateQuery = initCache?.updateQuery
+  const key = updateQuery || generateCacheKey({ operationName })
 
   // Client side cache works as expected
   // Server side cache works, but doesn't self isolate in regards to multiple users session data (test by opening different browsers, with different users logged in separately)
 
-  const keyIsCached = cacheStore.has(cacheKey)
+  const isCached = STORE.has(key)
 
-  if (!keyIsCached && data) {
-    cacheStore.set(cacheKey, data)
-    console.log("\nSET CACHE:", cacheStore, "\n\n")
+  if (!isCached && data) {
+    STORE.set(key, data)
+    console.warn("\nSET CACHE:", STORE, "\n\n")
     return // eslint-disable-line
   }
 
-  if (keyIsCached && updateQuery) {
-    const cachedData = cacheStore.get(cacheKey)
+  if (isCached && updateQuery) {
+    const cached = STORE.get(key)
 
     if (data?.[operationName].constructor === Array) {
-      cacheStore.set(cacheKey, {
-        [`${updateQuery}`]: [
-          ...cachedData?.[cacheKey],
-          ...data?.[operationName],
-        ],
+      STORE.set(key, {
+        [`${updateQuery}`]: [].concat(cached?.[key], data?.[operationName]),
       })
-      console.log("\nUPDATE_CACHE (ARRAY):", cacheStore, "\n\n")
+      console.warn("\nUPDATE_CACHE (ARRAY):", STORE, "\n\n")
       return // eslint-disable-line
     }
 
-    cacheStore.set(cacheKey, {
-      [`${updateQuery}`]: [...cachedData?.[cacheKey], data?.[operationName]],
+    STORE.set(key, {
+      [`${updateQuery}`]: [].concat(cached?.[key], data?.[operationName]),
     })
 
-    console.log("\nUPDATE_CACHE:", cacheStore, "\n\n")
+    console.warn("\nUPDATE_CACHE:", STORE, "\n\n")
     return // eslint-disable-line
   }
 }
