@@ -188,6 +188,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
         operationName: opName,
         isMutation: opType === "mutation",
         data: null,
+        variables: options?.variables,
       }
 
       // If there is data in the cache, return that data
@@ -217,7 +218,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
       ...this.requestOptions,
     }
 
-    console.warn("-----------FETCH-----------")
+    // console.warn("-----------FETCH-----------")
     const r = await fetch(this.uri, requestObject)
     if (r.ok !== true) {
       console.error(`${r.status} ${r.statusText}`)
@@ -267,7 +268,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
 
     // Cache stuff
     // //-------------------------------------------
-    // console.log("BEFORE SET CACHE", STORE)
+    // console.warn("BEFORE SET CACHE", STORE)
     // Set data in cache
     if (this.fetchPolicy === "cache" || options?.updateQuery) {
       await this.cache({
@@ -276,7 +277,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
         updateQuery: options?.updateQuery,
       })
     }
-    // console.log("AFTER SET CACHE", STORE)
+    // console.warn("AFTER SET CACHE", STORE)
     // //-------------------------------------------
 
     return [res.data, null]
@@ -291,7 +292,7 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
  */
 
 async function preFetch(initCache: InitCacheData) {
-  console.warn("-----------PRE-CACHE-----------")
+  // console.warn("-----------PRE-CACHE-----------")
   try {
     if (initCache.isMutation) {
       return [null, null]
@@ -301,12 +302,12 @@ async function preFetch(initCache: InitCacheData) {
     const isCached = STORE.has(key)
 
     if (isCached) {
+      // console.warn("-----------CACHE DATA EXISTS-----------")
       // console.warn("CACHED DATA", STORE.get(key))
-      console.warn("-----------CACHE DATA EXISTS-----------")
       return [STORE.get(key), null]
     }
 
-    console.warn("-----------NO CACHE DATA-----------")
+    // console.warn("-----------NO CACHE DATA-----------")
 
     return [null, null]
   } catch (err) {
@@ -337,7 +338,7 @@ MinusQL.prototype.cache = async function cache(initCache: CacheInput) {
 
   if (!isCached && data) {
     STORE.set(key, data)
-    console.warn("\nSET CACHE:", STORE, "\n\n")
+    // console.warn("\nSET CACHE:", STORE, "\n\n")
     return // eslint-disable-line
   }
 
@@ -348,7 +349,7 @@ MinusQL.prototype.cache = async function cache(initCache: CacheInput) {
       STORE.set(key, {
         [`${updateQuery}`]: [].concat(cached?.[key], data?.[operationName]),
       })
-      console.warn("\nUPDATE_CACHE (ARRAY):", STORE, "\n\n")
+      // console.warn("\nUPDATE_CACHE (ARRAY):", STORE, "\n\n")
       return // eslint-disable-line
     }
 
@@ -356,7 +357,7 @@ MinusQL.prototype.cache = async function cache(initCache: CacheInput) {
       [`${updateQuery}`]: [].concat(cached?.[key], data?.[operationName]),
     })
 
-    console.warn("\nUPDATE_CACHE:", STORE, "\n\n")
+    // console.warn("\nUPDATE_CACHE:", STORE, "\n\n")
     return // eslint-disable-line
   }
 }
