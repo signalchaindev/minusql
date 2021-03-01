@@ -69,13 +69,4 @@
     margin: 0 auto;
     max-width: max-content;
   }
-
-  section {
-    padding: 16px;
-  }
-
-  p {
-    text-align: center;
-    padding-top: 7px;
-  }
 </style>

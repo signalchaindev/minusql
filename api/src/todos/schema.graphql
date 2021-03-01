@@ -12,6 +12,7 @@ type Mutation {
 input TodoInput {
   todo: String
   completed: Boolean
+  notes: String
 }
 
 type Todo {

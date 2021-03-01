@@ -31,7 +31,7 @@
   <Loading />
 {:else if $cache}
   <ul>
-    {#each $cache.getAllTodos as todo}
+    {#each $cache.getAllTodos as todo (todo.id)}
       <Todo {todo} />
     {/each}
   </ul>

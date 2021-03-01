@@ -1,20 +1,20 @@
 <script>
-  import { client, gql } from "../graphql.js"
-  // import { GET_ALL_TODOS_QUERY } from "./TodosStore.js"
+  import { cache, useMutation } from "../cache.js"
+  import { gql } from "../graphql.js"
 
   export let todo
   $: completed = todo.completed
 
   const UPDATE_TODO_MUTATION = gql`
-    mutation UPDATE_TODO_MUTATION($id: ID!, $todo: TodoInput!) {
+    mutation UPDATE_TODO_MUTATION($id: String!, $todo: TodoInput!) {
       updateTodo(id: $id, todo: $todo)
     }
   `
 
   async function updateTodo() {
-    completed = !completed
+    console.log("todo:", todo)
 
-    const [data, error] = await client.mutation(UPDATE_TODO_MUTATION, {
+    const [_, error] = await useMutation(UPDATE_TODO_MUTATION, {
       variables: {
         id: todo.id,
         todo: {
@@ -22,22 +22,20 @@
           completed,
         },
       },
-      // refetchQuery: { query: GET_ALL_TODOS_QUERY },
+      updateQuery: "getAllTodos",
     })
 
     if (error) {
       console.error(error)
     }
-
-    console.log(data.updateTodo)
   }
 </script>
 
 <li id={todo.id}>
   <label for="todo_{todo.id}">
     <input
-      id="todo_{todo.id}"
       on:change={updateTodo}
+      id="todo_{todo.id}"
       type="checkbox"
       checked={completed}
     />
