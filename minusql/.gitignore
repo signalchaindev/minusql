@@ -1,5 +1,5 @@
 node_modules
+dist
+/utils
+typings/temp
 **/*.map
-**/*.d.ts
-index.js
-index.es.js

@@ -6,6 +6,8 @@ import { terser } from "rollup-plugin-terser"
 import resolve from "@rollup/plugin-node-resolve"
 import typescript from "rollup-plugin-typescript2"
 import multiInput from "rollup-plugin-multi-input"
+import dts from "rollup-plugin-dts"
+import { rimraf } from "./src/utils/rimraf.js"
 
 const pkg = JSON.parse(
   fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"),
@@ -21,6 +23,10 @@ const tsOptions = {
   tsconfig: "tsconfig.json",
   useTsconfigDeclarationDir: true,
 }
+
+rimraf(path.join(process.cwd(), "dist"))
+rimraf(path.join(process.cwd(), "typings"))
+rimraf(path.join(process.cwd(), "utils"))
 
 const config = {
   plugins: [
@@ -47,10 +53,9 @@ const config = {
     clearScreen: false,
     exclude: [
       "node_modules",
+      "dist",
       "typings",
-      "utils/**/*.js",
-      "index.js",
-      "index.es.js",
+      "utils",
       "**/*.map",
       "**/*.d.ts",
     ],
@@ -62,18 +67,30 @@ export default [
     input: "./main.ts",
     output: [
       { file: pkg.main, format: "cjs", sourcemap: true, exports: "named" },
-      { file: pkg.module, format: "esm", sourcemap: true, exports: "named" },
+      { file: pkg.module, format: "es", sourcemap: true, exports: "named" },
     ],
     ...config,
   },
   {
-    input: ["utils/**/*.ts", "!utils/**/*.d.ts"],
+    input: ["src/utils/**/*.ts"],
     output: {
-      dir: ".",
-      format: "esm",
+      dir: "./utils",
+      format: "es",
       sourcemap: true,
     },
     ...config,
-    plugins: [multiInput({ relative: "." }), ...config.plugins],
+    plugins: [multiInput({ relative: "./src/utils" }), ...config.plugins],
+  },
+  {
+    input: "./main.d.ts",
+    output: [
+      {
+        file: "typings/types.d.ts",
+        format: "es",
+        sourcemap: true,
+        exports: "named",
+      },
+    ],
+    plugins: [dts()],
   },
 ]

@@ -2,38 +2,10 @@ import fetch from "./utils/isoFetch" // .ts
 import { parseGQLString } from "./utils/parseGQLString" // .ts
 import { generateCacheKey } from "./utils/generateCacheKey" // .ts
 import { isEmpty } from "./utils/isEmpty" // .ts
-import { InitCacheData } from "./interfaces" // .ts
+import { RequestHeaders, RequestObject } from "./interfaces" // .ts
 
 type FetchPolicy = "cache" | "no-cache"
 
-type RequestMethod = "POST"
-
-interface RequestHeaders {
-  Accept: "application/json"
-  "Content-Type": "application/json"
-  [index: string]: any
-}
-
-type RequestMode = "cors" | "navigate" | "no-cors" | "same-origin"
-type RequestCredentials = "include" | "omit" | "same-origin"
-type RequestCache =
-  | "default"
-  | "force-cache"
-  | "no-cache"
-  | "no-store"
-  | "only-if-cached"
-  | "reload"
-
-// https://github.com/apollographql/apollo-client/issues/207#issuecomment-260639943
-interface RequestObject {
-  method: RequestMethod
-  headers: RequestHeaders
-  body: string
-  mode: RequestMode
-  credentials: RequestCredentials
-  cache: RequestCache
-  [key: string]: any
-}
 interface MinusQLInput {
   uri: string
   fetchPolicy?: FetchPolicy
@@ -44,6 +16,13 @@ interface MinusQLInput {
 
 type MinusQLReturn = [Object | null, Error | null]
 
+interface InitCacheData {
+  operationName: string
+  isMutation: boolean
+  data: Object | null
+  variables?: Object
+  updateQuery?: string
+}
 /**
  * The cache
  */

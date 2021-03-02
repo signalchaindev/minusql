@@ -5,21 +5,23 @@
     "allowUnreachableCode": true,
     "baseUrl": ".",
     "declaration": true,
-    "declarationDir": "./typings",
+    "declarationDir": "./typings/temp",
     "declarationMap": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "lib": ["es2019", "dom", "dom.iterable"],
     "module": "ESNext",
     "moduleResolution": "node",
     "noEmit": true,
     "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitThis": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
     "target": "es2019"
   },
-  "include": ["main.ts", "minusql.ts", "gql.ts", "interfaces.ts", "utils"],
-  "exclude": ["node_modules"]
+  "include": ["main.ts", "src"],
+  "exclude": ["node_modules", "dist", "typings", "utils"]
 }

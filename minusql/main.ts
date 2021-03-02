@@ -1,2 +1,2 @@
-export * from "./minusql" // .ts
-export * from "./gql" // .ts
+export * from "./src/minusql" // .ts
+export * from "./src/gql" // .ts

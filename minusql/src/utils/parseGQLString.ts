@@ -1,4 +1,6 @@
-export function parseGQLString(operation) {
+type ParseGQLStringReturn = [string, string]
+
+export function parseGQLString(operation: string): ParseGQLStringReturn {
   const operationType = operation && operation.split(" ")[0]
   const idx = operation && operation.split("{")[1]
   const idx2 = idx.split(" ")[1]
