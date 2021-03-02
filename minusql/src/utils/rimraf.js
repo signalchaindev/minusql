@@ -4,6 +4,7 @@ import kleur from "kleur"
 
 /**
  * @param {string}
+ *
  * @returns {void}
  */
 export function rimraf(entry_path) {
@@ -12,7 +13,6 @@ export function rimraf(entry_path) {
   }
 
   if (!fs.existsSync(entry_path)) {
-    console.warn(kleur.yellow(`path does not exist: ${entry_path}`))
     return
   }
 

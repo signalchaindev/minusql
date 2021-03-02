@@ -1,5 +1,3 @@
-// @ts-nocheck
-// TODO: Write types
-export function gql(strings, ...rest): string {
-  return String.raw({ raw: strings[0].replace(/[\s,]+/g, " ").trim() }, ...rest)
+export function gql(str: string): string {
+  return String.raw`${str.replace(/[\s,]+/g, " ").trim()}`
 }

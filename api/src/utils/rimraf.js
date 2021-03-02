@@ -8,7 +8,6 @@ export function rimraf(entry_path) {
   }
 
   if (!fs.existsSync(entry_path)) {
-    console.warn(kleur.yellow(`path does not exist: ${entry_path}`))
     return
   }
 

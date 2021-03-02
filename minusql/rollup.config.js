@@ -28,6 +28,25 @@ rimraf(path.join(process.cwd(), "dist"))
 rimraf(path.join(process.cwd(), "typings"))
 rimraf(path.join(process.cwd(), "utils"))
 
+function mvUtilsDTSFiles() {
+  return {
+    generateBundle() {
+      const src = path.join(process.cwd(), "typings", "temp", "src", "utils")
+      const dest = path.join(process.cwd(), "utils")
+      const files = fs.readdirSync(src)
+      files.forEach(file => {
+        const fileSrc = `${src}/${file}`
+        const fileDest = `${dest}/${file}`
+        fs.copyFile(fileSrc, fileDest, err => {
+          if (err) {
+            throw new Error(err)
+          }
+        })
+      })
+    },
+  }
+}
+
 const config = {
   plugins: [
     resolve({
@@ -91,6 +110,6 @@ export default [
         exports: "named",
       },
     ],
-    plugins: [dts()],
+    plugins: [dts(), mvUtilsDTSFiles()],
   },
 ]

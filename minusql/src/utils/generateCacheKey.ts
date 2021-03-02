@@ -1,4 +1,4 @@
-interface GenCacheKeyInput {
+export interface GenCacheKeyInput {
   operationName: string
   variables?: Object
 }
@@ -6,7 +6,7 @@ interface GenCacheKeyInput {
 export function generateCacheKey({
   operationName,
   variables,
-}: GenCacheKeyInput) {
+}: GenCacheKeyInput): string {
   if (variables && Object.keys(variables).length === 0) {
     return `${operationName}`
   }

@@ -4,9 +4,9 @@ import { generateCacheKey } from "./utils/generateCacheKey" // .ts
 import { isEmpty } from "./utils/isEmpty" // .ts
 import { RequestHeaders, RequestObject } from "./interfaces" // .ts
 
-type FetchPolicy = "cache" | "no-cache"
+export type FetchPolicy = "cache" | "no-cache"
 
-interface MinusQLInput {
+export interface MinusQLInput {
   uri: string
   fetchPolicy?: FetchPolicy
   credentials?: string
@@ -14,15 +14,16 @@ interface MinusQLInput {
   requestOptions?: Object
 }
 
-type MinusQLReturn = [Object | null, Error | null]
+export type MinusQLReturn = [Object | null, Error | null]
 
-interface InitCacheData {
+export interface InitCacheData {
   operationName: string
   isMutation: boolean
   data: Object | null
   variables?: Object
   updateQuery?: string
 }
+
 /**
  * The cache
  */
@@ -45,12 +46,16 @@ export function MinusQL(
 /**
  * Query method
  */
-type Operation = string // gql query string
-interface QueryInput {
+export type Operation = string // gql query string
+export interface QueryInput {
   variables?: Object
   fetchPolicy?: FetchPolicy
   headers?: RequestHeaders // additional headers (refer to fetch api)
   requestOptions?: Object // additional options to fetch request (refer to fetch api)
+}
+
+export interface MinusQL {
+  query(op: Operation, opts: QueryInput): Promise<MinusQLReturn>
 }
 
 MinusQL.prototype.query = async function query(
@@ -86,7 +91,7 @@ MinusQL.prototype.query = async function query(
 /**
  * Mutation method
  */
-interface MutationInput {
+export interface MutationInput {
   variables: Object
   headers?: RequestHeaders // additional headers (refer to fetch api)
   requestOptions?: Object // additional options to fetch request (refer to fetch api)
@@ -128,7 +133,7 @@ MinusQL.prototype.mutation = async function mutation(
 /**
  * Fetch handler
  */
-interface FetchHandlerOptions {
+export interface FetchHandlerOptions {
   operation: string // gql query string
   variables: Object // resolver variables
   fetchPolicy?: FetchPolicy
@@ -136,6 +141,16 @@ interface FetchHandlerOptions {
   requestOptions?: Object // additional options to fetch request (refer to fetch api)
   updateQuery?: string
   // deleteCacheItem?: Object
+}
+
+export interface ErrObj {
+  path?: string[]
+  message: string
+}
+
+export interface ResJson {
+  errors?: ErrObj[]
+  data: Object | null
 }
 
 MinusQL.prototype.fetchHandler = async function fetchHandler(
@@ -201,16 +216,6 @@ MinusQL.prototype.fetchHandler = async function fetchHandler(
     const r = await fetch(this.uri, requestObject)
     if (r.ok !== true) {
       console.error(`${r.status} ${r.statusText}`)
-    }
-
-    interface ErrObj {
-      path?: string[]
-      message: string
-    }
-
-    interface ResJson {
-      errors?: ErrObj[]
-      data: Object | null
     }
 
     const res: ResJson = await r.json()
@@ -298,7 +303,7 @@ async function preFetch(initCache: InitCacheData) {
  * Cache handler method
  */
 
-interface CacheInput {
+export interface CacheInput {
   operationName: string
   data: Object
   updateQuery: string
