@@ -1,5 +1,5 @@
-import { RequestObject } from "../interfaces"
-// .ts
+import { RequestObject } from "../interfaces" // .ts
+
 const f = m => m
 export const isoFetch =
   typeof global !== "undefined"

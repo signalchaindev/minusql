@@ -1,3 +1,3 @@
-export function gql(str: string): string {
-  return String.raw`${str.replace(/[\s,]+/g, " ").trim()}`
+export function gql(str: TemplateStringsArray): string {
+  return String.raw`${str[0].replace(/[\s,]+/g, " ").trim()}`
 }

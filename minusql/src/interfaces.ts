@@ -6,7 +6,12 @@ export interface RequestHeaders {
   [index: string]: any
 }
 
-export type RequestMode = "cors" | "navigate" | "no-cors" | "same-origin"
+export type RequestMode =
+  | "cors"
+  | "navigate"
+  | "no-cors"
+  | "same-origin"
+  | undefined
 export type RequestCredentials = "include" | "omit" | "same-origin"
 export type RequestCache =
   | "default"
@@ -21,8 +26,8 @@ export interface RequestObject {
   method: RequestMethod
   headers: RequestHeaders
   body: string
-  mode: RequestMode
+  mode?: RequestMode
   credentials: RequestCredentials
-  cache: RequestCache
+  cache?: RequestCache
   [key: string]: any
 }
