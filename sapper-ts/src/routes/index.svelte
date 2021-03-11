@@ -1,56 +1,45 @@
-<script>
-  import successkid from "images/successkid.jpg"
+<script context="module">
+  import { useQuery } from "../cache.js"
+  import { gql } from "../graphql.js"
+
+  const CMS_QUERY = gql`
+    query CMS_QUERY {
+      homePage {
+        title
+      }
+    }
+  `
+
+  export async function preload() {
+    const [data, error] = await useQuery(CMS_QUERY)
+    return {
+      title: data?.homePage?.title || null,
+      error: error || null,
+    }
+  }
 </script>
 
-<svelte:head>
-  <title>Sapper project template</title>
-</svelte:head>
+<script>
+  import InputForm from "../components/InputForm.svelte"
+  import TodoList from "../components/TodoList.svelte"
+  import { ErrorStore } from "../stores/store_Errors.js"
 
-<h1>Great success!</h1>
+  export let title
+  export let error
 
-<figure>
-  <img alt="Success Kid" src={successkid} />
-  <figcaption>Have fun with Sapper!</figcaption>
-</figure>
+  if (error) {
+    ErrorStore.set(error)
+  }
+</script>
 
-<p>
-  <strong
-    >Try editing this file (src/routes/index.svelte) to test live reloading.</strong
-  >
-</p>
+<section>
+  <h1>{title}</h1>
+  <InputForm />
+  <TodoList />
+</section>
 
 <style>
-  h1,
-  figure,
-  p {
-    text-align: center;
-    margin: 0 auto;
-  }
-
   h1 {
-    font-size: 2.8em;
-    text-transform: uppercase;
-    font-weight: 700;
-    margin: 0 0 0.5em 0;
-  }
-
-  figure {
-    margin: 0 0 1em 0;
-  }
-
-  img {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 0 1em 0;
-  }
-
-  p {
-    margin: 1em auto;
-  }
-
-  @media (min-width: 480px) {
-    h1 {
-      font-size: 4em;
-    }
+    text-align: center;
   }
 </style>

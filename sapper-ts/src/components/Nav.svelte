@@ -1,60 +1,59 @@
-<script lang="ts">
-	export let segment: string;
+<script>
+  import { cache } from "../cache.js"
+
+  export let nav
 </script>
 
+<header>
+  <nav>
+    <ul>
+      {#if nav}
+        {#each nav as n}
+          <li>
+            <a href={n.link} sapper:prefetch>{n.text}</a>
+          </li>
+        {/each}
+      {/if}
+    </ul>
+  </nav>
+
+  <p>{$cache?.testConnection || "Loading..."}</p>
+</header>
+
 <style>
-	nav {
-		border-bottom: 1px solid rgba(255,62,0,0.1);
-		font-weight: 300;
-		padding: 0 1em;
-	}
+  header {
+    position: relative;
+    background: #eee;
+    font-size: 16px;
+    text-transform: uppercase;
+  }
 
-	ul {
-		margin: 0;
-		padding: 0;
-	}
+  nav {
+    display: flex;
+    justify-content: center;
+  }
 
-	/* clearfix */
-	ul::after {
-		content: '';
-		display: block;
-		clear: both;
-	}
+  ul {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+  }
 
-	li {
-		display: block;
-		float: left;
-	}
+  a {
+    display: inline-block;
+    padding: 16px 12px;
+    text-decoration: none;
+  }
 
-	[aria-current] {
-		position: relative;
-		display: inline-block;
-	}
+  a:hover {
+    background: #fff;
+  }
 
-	[aria-current]::after {
-		position: absolute;
-		content: '';
-		width: calc(100% - 1em);
-		height: 2px;
-		background-color: rgb(255,62,0);
-		display: block;
-		bottom: -1px;
-	}
-
-	a {
-		text-decoration: none;
-		padding: 1em 0.5em;
-		display: block;
-	}
+  p {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+  }
 </style>
-
-<nav>
-	<ul>
-		<li><a aria-current="{segment === undefined ? 'page' : undefined}" href=".">home</a></li>
-		<li><a aria-current="{segment === 'about' ? 'page' : undefined}" href="about">about</a></li>
-
-		<!-- for the blog link, we're using rel=prefetch so that Sapper prefetches
-		     the blog data when we hover over the link or tap it on a touchscreen -->
-		<li><a rel=prefetch aria-current="{segment === 'blog' ? 'page' : undefined}" href="blog">blog</a></li>
-	</ul>
-</nav>
