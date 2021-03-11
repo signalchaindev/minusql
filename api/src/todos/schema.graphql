@@ -6,10 +6,11 @@ type Query {
 type Mutation {
   createTodo(todo: String!): Todo!
   deleteTodo(id: String!): String
-  updateTodo(id: String!, todo: TodoInput!): String
+  updateTodo(todo: TodoInput!): Todo!
 }
 
 input TodoInput {
+  id: String!
   todo: String
   completed: Boolean
   notes: String

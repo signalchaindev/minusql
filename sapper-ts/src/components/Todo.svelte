@@ -6,24 +6,30 @@
   $: completed = todo.completed
 
   const UPDATE_TODO_MUTATION = gql`
-    mutation UPDATE_TODO_MUTATION($id: String!, $todo: TodoInput!) {
-      updateTodo(id: $id, todo: $todo)
+    mutation UPDATE_TODO_MUTATION($todo: TodoInput!) {
+      updateTodo(todo: $todo) {
+        id
+        todo
+        completed
+      }
     }
   `
 
   async function updateTodo() {
     console.log("todo:", todo)
 
-    const [_, error] = await useMutation(UPDATE_TODO_MUTATION, {
+    const [data, error] = await useMutation(UPDATE_TODO_MUTATION, {
       variables: {
-        id: todo.id,
         todo: {
+          id: todo.id,
           todo: todo.todo,
           completed,
         },
       },
-      updateQuery: "getAllTodos",
+      refetchQuery: "getAllTodos",
     })
+
+    console.log("data:", data)
 
     if (error) {
       console.error(error)

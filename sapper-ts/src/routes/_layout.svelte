@@ -32,6 +32,9 @@
   import Nav from "../components/Nav.svelte"
   import ErrorToast from "../components/lib/Toast_Error.svelte"
   import { ErrorStore } from "../stores/store_Errors.js"
+  import { cache } from "../cache.js"
+
+  // $: console.log("cache:", $cache)
 
   export let nav
   export let error
