@@ -6,7 +6,7 @@ import { RequestCredentials, RequestHeaders, RequestObject } from "./interfaces"
 
 export type FetchPolicy = "cache" | "no-cache"
 
-export interface MinusQL {
+export interface MinusQLInput {
   uri: string
   fetchPolicy?: FetchPolicy
   credentials?: RequestCredentials
@@ -73,13 +73,19 @@ const STORE = new Map()
  */
 /* eslint-disable no-redeclare */
 export class MinusQL {
+  uri: string
+  fetchPolicy?: FetchPolicy
+  credentials?: RequestCredentials
+  headers?: RequestHeaders
+  requestOptions?: Object
+
   constructor({
     uri,
     fetchPolicy,
     credentials,
     headers,
     requestOptions,
-  }: MinusQL) {
+  }: MinusQLInput) {
     this.uri = uri
     this.fetchPolicy = fetchPolicy || "cache"
     this.credentials = credentials
@@ -150,6 +156,7 @@ export class MinusQL {
   /**
    * Fetch handler
    */
+  /** @internal */
   async fetchHandler(
     operation: Operation,
     options?: FetchHandlerOptions,
@@ -269,8 +276,8 @@ export class MinusQL {
 
   /**
    * Prefetch Handler - Handles Caching Policies
-   * @private
    */
+  /** @internal */
   async preFetch(initCache: InitCacheData): Promise<any> {
     // console.warn("-----------PRE-CACHE-----------")
     try {

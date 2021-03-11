@@ -5,7 +5,7 @@
     "allowUnreachableCode": true,
     "baseUrl": ".",
     "declaration": true,
-    "declarationDir": "./typings/temp",
+    "declarationDir": "./typings",
     "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

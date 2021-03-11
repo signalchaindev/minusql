@@ -31,7 +31,7 @@ rimraf(path.join(process.cwd(), "utils"))
 function mvUtilsDTSFiles() {
   return {
     generateBundle() {
-      const src = path.join(process.cwd(), "typings", "temp", "src", "utils")
+      const src = path.join(process.cwd(), "typings", "src", "utils")
       const dest = path.join(process.cwd(), "utils")
       const files = fs.readdirSync(src)
       files.forEach(file => {
