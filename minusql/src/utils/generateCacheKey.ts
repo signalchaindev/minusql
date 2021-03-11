@@ -7,8 +7,12 @@ export function generateCacheKey({
   operationName,
   variables,
 }: GenCacheKeyInput): string {
-  if (variables && Object.keys(variables).length === 0) {
+  try {
+    if (variables) {
+      return `${operationName}${JSON.stringify(variables)}`
+    }
     return `${operationName}`
+  } catch (err) {
+    throw new Error(err)
   }
-  return `${operationName}${JSON.stringify(variables)}`
 }
