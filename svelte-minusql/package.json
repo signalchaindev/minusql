@@ -1,0 +1,62 @@
+{
+  "name": "svelte-minusql",
+  "version": "1.0.0",
+  "author": "jameygleason",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.es.js",
+  "types": "./typings/types.d.ts",
+  "description": "",
+  "keywords": [
+    "graphql",
+    "graphql client",
+    "svelte",
+    "svelte graphql"
+  ],
+  "bugs": {
+    "email": "todo@example.com",
+    "url": "https://github.com/username/minusql/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/minusql"
+  },
+  "files": [
+    "index.js",
+    "index.es.js",
+    "package.json",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "rollup -c -w",
+    "build": "cross-env NODE_ENV=true && rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "4.17.0",
+    "@typescript-eslint/parser": "4.17.0",
+    "eslint": "7.22.0",
+    "eslint-config-standard": "16.0.2",
+    "eslint-import-resolver-typescript": "2.4.0",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-json": "2.1.2",
+    "eslint-plugin-mocha": "8.1.0",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-prettier": "3.3.1",
+    "eslint-plugin-standard": "5.0.0",
+    "kleur": "4.1.4",
+    "minusql": "file:../minusql",
+    "rollup-plugin-dts": "3.0.1",
+    "rollup-plugin-filesize": "9.1.1",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "svelte": "3.35.0",
+    "ts-node": "9.1.1",
+    "tslib": "2.1.0",
+    "typescript": "4.2.3"
+  },
+  "peerDependencies": {
+    "minusql": "^0.1.0",
+    "svelte": "^3.0.0"
+  }
+}
