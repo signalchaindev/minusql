@@ -6,11 +6,11 @@
     "url": "git@scdgh:signalchaindev/minusql.git"
   },
   "scripts": {
-    "dev": "run-p api sapper minusql svelte-minusql",
+    "dev": "run-p api sapper",
     "minusql": "pushd minusql && npm run dev",
     "svelte-minusql": "pushd svelte-minusql && npm run dev",
     "api": "pushd api && npm run dev",
-    "sapper": "pushd sapper-ts && npm run dev",
+    "sapper": "pushd sapper && npm run dev",
     "//svelte": "pushd web && npm run dev",
     "//static": "pushd examples\\static && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"

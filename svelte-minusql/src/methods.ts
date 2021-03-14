@@ -1,7 +1,7 @@
 // @ts-nocheck
-import { writable } from "svelte/store"
+import { writable } from "svelte/store" // eslint-disable-line
 import { parseGQLString } from "minusql/utils/parseGQLString.js"
-import { client } from "./context"
+import { getClient } from "./context"
 
 /**
  * Cache Store - Set Cache
@@ -23,6 +23,7 @@ export const cache = setCache()
  * User Query
  */
 export async function useQuery(operation, opts) {
+  const client = getClient()
   const [data, error] = await client.query(operation, opts)
   if (error) {
     return [null, error]
@@ -36,6 +37,7 @@ export async function useQuery(operation, opts) {
  * User Mutation
  */
 export async function useMutation(operation, opts) {
+  const client = getClient()
   const [data, error] = await client.mutation(operation, opts)
   if (error) {
     return [null, error]

@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte"
   import { gql } from "minusql"
-  import { useQuery } from "../cache.js"
+  import { useQuery } from "svelte-minusql"
   import { ErrorStore } from "../stores/store_Errors.js"
 
   const HANDLE_ERRORS_QUERY = gql`

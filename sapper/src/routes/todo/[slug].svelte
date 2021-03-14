@@ -9,7 +9,7 @@
 <script>
   import { onMount } from "svelte"
   import { gql } from "minusql"
-  import { cache, useQuery, useMutation } from "../../cache.js"
+  import { cache, useQuery, useMutation } from "svelte-minusql"
   import { ErrorStore } from "../../stores/store_Errors.js"
 
   export let todoId

@@ -1,16 +1,10 @@
 // @ts-ignore
-import { getContext, setContext } from "svelte"
-
-const CLIENT = typeof Symbol !== "undefined" ? Symbol("client") : "@@client"
+let CLIENT
 
 export function setClient(client): void {
-  setContext(CLIENT, client)
+  CLIENT = client
 }
 
-function getClient() {
-  const client = getContext(CLIENT)
-  if (!client) throw new Error("Client has not been set")
-  return client
+export function getClient() {
+  return CLIENT
 }
-
-export const client = getClient()

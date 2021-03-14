@@ -3,7 +3,7 @@
   import { gql } from "minusql"
   import Todo from "./Todo.svelte"
   import Loading from "./Loading.svelte"
-  import { cache, useQuery } from "../cache.js"
+  import { cache, useQuery } from "svelte-minusql"
 
   let loading = true
 

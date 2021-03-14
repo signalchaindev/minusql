@@ -1,6 +1,6 @@
 <script>
   import { gql } from "minusql"
-  import { cache, useMutation } from "../cache.js"
+  import { cache, useMutation } from "svelte-minusql"
 
   export let todo
   $: completed = todo.completed

@@ -1,5 +1,5 @@
 <script>
-  import { cache } from "../cache.js"
+  import { cache } from "svelte-minusql"
 
   export let nav
 </script>
