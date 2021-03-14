@@ -7,8 +7,8 @@
  */
 export function safeJsonParse(str) {
   try {
-    return [JSON.parse(str), null];
+    return [JSON.parse(str), null]
   } catch (err) {
-    return [str, err];
+    return [str, err]
   }
 }

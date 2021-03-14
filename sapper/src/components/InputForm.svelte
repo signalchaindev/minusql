@@ -1,5 +1,5 @@
 <script>
-  import { gql } from "../graphql.js"
+  import { gql } from "minusql"
   import { useMutation } from "../cache.js"
   import { ErrorStore } from "../stores/store_Errors.js"
 

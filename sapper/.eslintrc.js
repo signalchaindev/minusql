@@ -24,7 +24,7 @@ module.exports = {
     browser: true,
     node: true,
   },
-  parser: "babel-eslint",
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: "module",
@@ -38,7 +38,14 @@ module.exports = {
     caches: true,
     fetch: true,
   },
-  plugins: ["svelte3", "node", "import", "json", "graphql"],
+  plugins: [
+    "@typescript-eslint",
+    "svelte3",
+    "node",
+    "import",
+    "json",
+    "graphql",
+  ],
   overrides: [
     {
       files: ["**/*.svelte"],
@@ -61,10 +68,19 @@ module.exports = {
         map: [["@sapper", "./src/node_modules/@sapper"]],
         extensions: [".js", ".ts", ".svelte"],
       },
+      typescript: {}, // this loads <root_dir>/tsconfig.json to eslint
     },
   },
   rules: {
     // ENV Specific
+    "@typescript-eslint/no-extra-semi": 0,
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_|req|res|next|args|ctx|__",
+        varsIgnorePattern: "^_|req|res|next|args|ctx|__",
+      },
+    ],
     "graphql/template-strings": [
       "error",
       {

@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte"
-  import { gql } from "../graphql.js"
+  import { gql } from "minusql"
   import Todo from "./Todo.svelte"
   import Loading from "./Loading.svelte"
   import { cache, useQuery } from "../cache.js"

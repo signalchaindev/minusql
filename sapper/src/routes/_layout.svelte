@@ -1,5 +1,5 @@
 <script context="module">
-  import { gql } from "../graphql.js"
+  import { gql } from "minusql"
   import { useQuery } from "../cache.js"
 
   const CMS_QUERY = gql`
@@ -32,6 +32,9 @@
   import Nav from "../components/Nav.svelte"
   import ErrorToast from "../components/lib/Toast_Error.svelte"
   import { ErrorStore } from "../stores/store_Errors.js"
+  import { cache } from "../cache.js"
+
+  // $: console.log("cache:", $cache)
 
   export let nav
   export let error

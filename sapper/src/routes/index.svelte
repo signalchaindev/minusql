@@ -1,6 +1,6 @@
 <script context="module">
+  import { gql } from "minusql"
   import { useQuery } from "../cache.js"
-  import { gql } from "../graphql.js"
 
   const CMS_QUERY = gql`
     query CMS_QUERY {

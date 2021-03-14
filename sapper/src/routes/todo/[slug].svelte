@@ -8,8 +8,8 @@
 
 <script>
   import { onMount } from "svelte"
+  import { gql } from "minusql"
   import { cache, useQuery, useMutation } from "../../cache.js"
-  import { gql } from "../../graphql.js"
   import { ErrorStore } from "../../stores/store_Errors.js"
 
   export let todoId
@@ -47,8 +47,13 @@
   })
 
   const UPDATE_TODO_MUTATION = gql`
-    mutation UPDATE_TODO_MUTATION($id: String!, $todo: TodoInput!) {
-      updateTodo(id: $id, todo: $todo)
+    mutation UPDATE_TODO_MUTATION($todo: TodoInput!) {
+      updateTodo(todo: $todo) {
+        id
+        todo
+        completed
+        notes
+      }
     }
   `
 
@@ -64,7 +69,7 @@
           notes: todo.notes,
         },
       },
-      updateQuery: "getAllTodos",
+      refetch: ["getAllTodos", "getTodoById"],
     })
 
     if (error) {
