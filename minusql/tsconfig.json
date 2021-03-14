@@ -23,6 +23,6 @@
     "stripInternal": true,
     "target": "es2019"
   },
-  "include": ["main.ts", "src"],
+  "include": ["main.ts", "src", "rimraf.js"],
   "exclude": ["node_modules", "dist", "typings", "utils"]
 }

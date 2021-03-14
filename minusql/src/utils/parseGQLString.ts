@@ -1,4 +1,4 @@
-type ParseGQLStringReturn = [string, string]
+export type ParseGQLStringReturn = [string, string]
 
 export function parseGQLString(operation: string): ParseGQLStringReturn {
   const operationType = operation && operation.split(" ")[0]

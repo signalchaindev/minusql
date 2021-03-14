@@ -1,4 +1,4 @@
-import { RequestObject } from "../interfaces" // .ts
+import type { RequestObject } from "../interfaces" // .ts
 
 const f = m => m
 export const isoFetch =

@@ -8,7 +8,7 @@ import typescript from "rollup-plugin-typescript2"
 import multiInput from "rollup-plugin-multi-input"
 import dts from "rollup-plugin-dts"
 import filesize from "rollup-plugin-filesize"
-import { rimraf } from "./src/utils/rimraf.js"
+import { rimraf } from "./rimraf.js"
 
 const pkg = JSON.parse(
   fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"),
