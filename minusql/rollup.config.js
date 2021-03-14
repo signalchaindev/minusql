@@ -7,6 +7,7 @@ import resolve from "@rollup/plugin-node-resolve"
 import typescript from "rollup-plugin-typescript2"
 import multiInput from "rollup-plugin-multi-input"
 import dts from "rollup-plugin-dts"
+import filesize from "rollup-plugin-filesize"
 import { rimraf } from "./src/utils/rimraf.js"
 
 const pkg = JSON.parse(
@@ -34,6 +35,10 @@ function mvUtilsDTSFiles() {
       const src = path.join(process.cwd(), "typings", "src", "utils")
       const dest = path.join(process.cwd(), "utils")
       const files = fs.readdirSync(src)
+      fs.writeFileSync(
+        path.join(dest, ".generated-files"),
+        "// This directory is generated at build time",
+      )
       files.forEach(file => {
         const fileSrc = `${src}/${file}`
         const fileDest = `${dest}/${file}`
@@ -89,6 +94,7 @@ export default [
       { file: pkg.module, format: "es", sourcemap: true, exports: "named" },
     ],
     ...config,
+    plugins: [...config.plugins, filesize()],
   },
   {
     input: ["src/utils/**/*.ts"],
