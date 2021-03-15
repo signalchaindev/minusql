@@ -17,7 +17,7 @@ input TodoInput {
 }
 
 type Todo {
-  id: ID
+  _id: ID
   todo: String
   completed: Boolean
   notes: String

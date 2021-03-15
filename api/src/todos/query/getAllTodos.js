@@ -1,11 +1,5 @@
-import todos from "../../../database/todos.js"
+import { Todo } from "../model" // .ts
 
-export function getAllTodos() {
-  const entries = []
-
-  for (const [_, entry] of todos) {
-    entries.push(entry)
-  }
-
-  return entries
+export async function getAllTodos() {
+  return Todo.find().catch(console.error())
 }

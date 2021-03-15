@@ -1,6 +1,5 @@
-import todos from "../../../database/todos.js"
+import { Todo } from "../model" // .ts
 
-export function getTodoById(_, { id }) {
-  const todo = todos.get(id)
-  return todo
+export async function getTodoById(_, { id }) {
+  return Todo.findById(id).catch(console.error())
 }

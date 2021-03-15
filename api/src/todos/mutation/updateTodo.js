@@ -1,14 +1,5 @@
-import todos from "../../../database/todos.js"
-import { getTodoById } from "../query/getTodoById.js"
+import { Todo } from "../model" // .ts
 
-export function updateTodo(_, { todo }) {
-  const currTodo = getTodoById(_, { id: todo.id })
-  const updatedTodo = {
-    ...currTodo,
-    ...todo,
-  }
-
-  todos.set(todo.id, updatedTodo)
-
-  return updatedTodo
+export async function updateTodo(_, { todo }) {
+  return Todo.findByIdAndUpdate({ _id: todo.id }, todo).catch(console.error())
 }

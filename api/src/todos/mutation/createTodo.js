@@ -1,16 +1,9 @@
-import todos from "../../../database/todos.js"
-import generateId from "../../../database/utils/generateId.js"
+import { Todo } from "../model" // .ts
 
-export function createTodo(_, { todo }) {
-  const id = generateId()
-  const newTodo = {
-    id,
+export async function createTodo(_, { todo }) {
+  return Todo.create({
     todo,
     completed: false,
     notes: "",
-  }
-
-  todos.set(id, newTodo)
-
-  return newTodo
+  }).catch(console.error)
 }

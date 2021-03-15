@@ -2,7 +2,7 @@
 // import signUpUser from "../../auth/mutation/signUpUser.js";
 
 export async function populateDb(_, args, ctx) {
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== "development") {
     throw new Error(
       "You're trying to populate the production database with fake data dummy! Don't do that.",
     )
@@ -10,17 +10,17 @@ export async function populateDb(_, args, ctx) {
 
   const users = [
     {
-      name: 'Admin',
-      email: 'admin@mail.com',
-      permissions: ['ADMIN', 'USER', 'SUPER_ADMIN'],
+      name: "Admin",
+      email: "admin@mail.com",
+      permissions: ["ADMIN", "USER", "SUPER_ADMIN"],
     },
     {
-      name: 'Jamey',
-      email: 'jamey@mail.com',
-      password: 'asdfasdf',
+      name: "Jamey",
+      email: "jamey@mail.com",
+      password: "asdfasdf",
     },
   ]
-  console.log('users:', users)
+  console.log("users:", users)
 
   // Uncomment after "signUpUser" mutation is implemented
   // // Sign them up
@@ -29,5 +29,5 @@ export async function populateDb(_, args, ctx) {
   //   await signUpUser(_, input, ctx);
   // }
 
-  return { successMessage: 'Populated DB' }
+  return { successMessage: "Populated DB" }
 }
