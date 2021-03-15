@@ -1,0 +1,14 @@
+type Mutation {
+  signIn(email: String!,password: String!): User
+  signOut: String
+  signUp(email: String!,password: String!): User
+}
+
+type Query {
+  getCurrentUser(id: String!): User!
+}
+
+type User {
+  email: String
+  password: String
+}

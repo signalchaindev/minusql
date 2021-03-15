@@ -4,10 +4,10 @@ const Schema = mongoose.Schema
 
 const TodoSchema = new Schema(
   {
-    // userId: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "users",
-    // },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
+    },
     todo: {
       type: String,
       trim: true,
