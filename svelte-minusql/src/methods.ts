@@ -53,17 +53,18 @@ export async function useMutation(operation, opts) {
     })
 
     if (data?.[operationName].constructor === Array) {
-      cache?.set(opts.appendToCache, [
-        ...cachedData?.[opts.appendToCache],
-        ...data?.[operationName],
-      ])
+      cache?.set(
+        opts.appendToCache,
+        [].concat(cachedData?.[opts.appendToCache], data?.[operationName]),
+      )
       return [data, null]
     }
 
-    cache?.set(opts.appendToCache, [
-      ...cachedData?.[opts.appendToCache],
-      data?.[operationName],
-    ])
+    // TODO: Test that the data?.[operationName] is being concatenated properly
+    cache?.set(
+      opts.appendToCache,
+      [].concat(cachedData?.[opts.appendToCache], data?.[operationName]),
+    )
     return [data, null]
   }
 
