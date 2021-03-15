@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { readable, writable } from "svelte/store" // eslint-disable-line
+import { writable } from "svelte/store" // eslint-disable-line
 import { parseGQLString } from "minusql/utils/parseGQLString.js"
 import { getClient } from "./context"
 
