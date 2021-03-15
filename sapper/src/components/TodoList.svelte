@@ -21,7 +21,7 @@
 
 {#if loading}
   <Loading />
-{:else if $data?.getAllTodos.length > 0}
+{:else if $data?.getAllTodos?.length > 0}
   <ul>
     {#each $data.getAllTodos as todo (todo._id)}
       <Todo {todo} />

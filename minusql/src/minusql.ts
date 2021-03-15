@@ -20,7 +20,7 @@ export interface MinusQLInput {
 
 export type MinusQLReturn = [Object | null, Error | null]
 
-export type RefetchQuery = { query: string; variables: Object }
+export type UpdateQuery = { query: string; variables: Object }
 
 export interface ResolverInput {
   variables?: { [key: string]: any }
@@ -33,7 +33,8 @@ export interface QueryInput extends ResolverInput {}
 
 export interface MutationInput extends ResolverInput {
   appendToCache?: string
-  refetchQuery?: RefetchQuery[]
+  refetchQuery?: UpdateQuery[]
+  deleteCacheKey?: UpdateQuery[]
 }
 
 export type Operation = string // gql query string
@@ -44,7 +45,8 @@ export interface FetchHandlerOptions {
   requestOptions?: Object // additional options to fetch request (refer to fetch api)
   fetchPolicy?: FetchPolicy
   appendToCache?: string
-  refetchQuery?: RefetchQuery[]
+  refetchQuery?: UpdateQuery[]
+  deleteCacheKey?: UpdateQuery[]
 }
 
 export interface InitCacheData {
@@ -53,7 +55,7 @@ export interface InitCacheData {
   data: Object | null
   variables?: Object
   appendToCache?: string
-  refetchQuery?: RefetchQuery[]
+  refetchQuery?: UpdateQuery[]
 }
 
 export interface ErrObj {
@@ -69,8 +71,11 @@ export interface ResJson {
 /**
  * The cache
  */
-const STORE = new Map()
-let REFETCH_COUNT: number = 0
+const CACHE = new Map()
+
+export function getCache() {
+  return CACHE
+}
 
 /**
  * Create a MinusQL instance
@@ -167,7 +172,7 @@ export class MinusQL {
         }
 
         // If there is data in the cache, return that data
-        const [cacheData, err] = await this.preFetch(initCache)
+        const [cacheData, err] = this.preFetchHandler(initCache)
         if (err) {
           console.error(err)
         }
@@ -241,32 +246,28 @@ export class MinusQL {
         ]
       }
 
+      if (options?.deleteCacheKey) {
+        await this.deleteCacheKeyHandler(options)
+      }
+
+      if (options?.refetchQuery) {
+        await this.refetchHandler(options)
+      }
+
       // Cache stuff
       // //-------------------------------------------
-      // console.warn("BEFORE SET CACHE", STORE)
+      // console.warn("BEFORE SET CACHE", CACHE)
       // Set data in cache
       if (hitCache) {
-        await this.cache({
+        this.cacheHandler({
           operationName,
           data: res?.data,
           variables: options?.variables,
           appendToCache: options?.appendToCache,
         })
       }
-      // console.warn("AFTER SET CACHE", STORE)
+      // console.warn("AFTER SET CACHE", CACHE)
       // //-------------------------------------------
-
-      if (REFETCH_COUNT > 0) {
-        STORE.delete(operationName)
-        REFETCH_COUNT -= 1
-      }
-
-      if (options?.refetchQuery) {
-        REFETCH_COUNT = options?.refetchQuery.length
-        for (const { query, variables } of options?.refetchQuery) {
-          this.query(query, { variables, fetchPolicy: "no-cache" })
-        }
-      }
 
       return [res.data, null]
     } catch (err) {
@@ -274,11 +275,32 @@ export class MinusQL {
     }
   }
 
+  async deleteCacheKeyHandler(options) {
+    for (const { query, variables } of options.deleteCacheKey) {
+      const [_, name] = parseGQLString(query)
+      const key = generateCacheKey({ operationName: name, variables })
+      CACHE.delete(key)
+      await this.refetchHandler(options)
+    }
+  }
+
+  async refetchHandler(options) {
+    for (const { query, variables } of options.refetchQuery) {
+      const [_, name] = parseGQLString(query)
+      const key = generateCacheKey({ operationName: name, variables })
+      CACHE.delete(key)
+      await this.fetchHandler(query, {
+        variables,
+        fetchPolicy: "cache",
+      })
+    }
+  }
+
   /**
    * Prefetch Handler - Handles Caching Policies
    */
   /** @internal */
-  async preFetch(initCacheData: InitCacheData): Promise<any> {
+  preFetchHandler(initCacheData: InitCacheData): [Object | null, Error | null] {
     // console.warn("-----------PRE-CACHE-----------")
     try {
       if (initCacheData.isMutation) {
@@ -286,12 +308,12 @@ export class MinusQL {
       }
 
       const key = generateCacheKey(initCacheData)
-      const isCached = STORE.has(key)
+      const isCached = CACHE.has(key)
 
       if (isCached) {
         // console.warn("-----------CACHE DATA EXISTS-----------")
-        // console.warn("CACHED DATA", STORE.get(key))
-        return [STORE.get(key), null]
+        // console.warn("CACHED DATA", CACHE.get(key))
+        return [CACHE.get(key), null]
       }
 
       // console.warn("-----------NO CACHE DATA-----------")
@@ -305,7 +327,7 @@ export class MinusQL {
   /**
    * Cache handler method
    */
-  async cache(initCacheData: InitCacheData): Promise<void> {
+  cacheHandler(initCacheData: InitCacheData): Object | undefined {
     try {
       const operationName = initCacheData?.operationName
       const data = initCacheData?.data
@@ -315,34 +337,34 @@ export class MinusQL {
       // Client side cache works as expected
       // Server side cache works, but doesn't self isolate in regards to multiple users session data (test by opening different browsers, with different users logged in separately)
 
-      const isCached = STORE.has(key)
+      const isCached = CACHE.has(key)
 
       if (!isCached && data) {
-        STORE.set(key, data)
-        console.warn("\nSET CACHE:", STORE, "\n\n")
-        return // eslint-disable-line
+        CACHE.set(key, data)
+        console.warn("\nSET CACHE:", CACHE, "\n\n")
+        return CACHE
       }
 
       if (isCached && appendToCache) {
-        const cached = STORE.get(key)
+        const cached = CACHE.get(key)
 
         if (data?.[operationName].constructor === Array) {
-          STORE.set(key, {
+          CACHE.set(key, {
             [`${appendToCache}`]: [].concat(
               cached?.[key],
               data?.[operationName],
             ),
           })
-          console.warn("\nUPDATE_CACHE (ARRAY):", STORE, "\n\n")
-          return // eslint-disable-line
+          console.warn("\nUPDATE_CACHE (ARRAY):", CACHE, "\n\n")
+          return CACHE
         }
 
-        STORE.set(key, {
+        CACHE.set(key, {
           [`${appendToCache}`]: [].concat(cached?.[key], data?.[operationName]),
         })
 
-        console.warn("\nUPDATE_CACHE:", STORE, "\n\n")
-        return // eslint-disable-line
+        console.warn("\nUPDATE_CACHE:", CACHE, "\n\n")
+        return CACHE
       }
     } catch (err) {
       throw new Error(`CACHE_ERROR: ${err}`)

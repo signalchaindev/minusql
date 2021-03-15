@@ -1,9 +1,6 @@
 import { Todo } from "../model" // .ts
 
-export function deleteTodo(_, args) {
-  const { id } = args
-
-  // todos.delete(id)
-
+export async function deleteTodo(_, { id }) {
+  Todo.deleteOne({ _id: id }).catch(console.error())
   return "Todo has been deleted"
 }

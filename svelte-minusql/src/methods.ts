@@ -1,7 +1,8 @@
 // @ts-nocheck
-import { writable } from "svelte/store" // eslint-disable-line
-import { parseGQLString } from "minusql/utils/parseGQLString.js"
-import { getClient } from "./context"
+import { writable } from "svelte/store"
+import { getCache } from "minusql"
+import { getClient } from "./context" // .ts
+import { mapToObject } from "./utils" // .ts
 
 /**
  * Cache Store - Set Cache
@@ -11,9 +12,8 @@ function setCache() {
   const { subscribe, set } = writable(cacheStore)
   return {
     subscribe,
-    set(key, data) {
-      cacheStore[key] = data
-      return set(cacheStore)
+    set(cache) {
+      return set(cache)
     },
   }
 }
@@ -24,13 +24,13 @@ export const cache = setCache()
  */
 export async function useQuery(operation, opts) {
   const client = getClient()
-  const [data, error] = await client.query(operation, opts)
+  const CACHE = getCache()
+  const [_, error] = await client.query(operation, opts)
   if (error) {
     return [null, error]
   }
 
-  const [_, operationName] = parseGQLString(operation)
-  cache?.set(operationName, data?.[operationName])
+  cache?.set(mapToObject(CACHE))
 
   return [cache, null]
 }
@@ -40,33 +40,13 @@ export async function useQuery(operation, opts) {
  */
 export async function useMutation(operation, opts) {
   const client = getClient()
+  const CACHE = getCache()
   const [data, error] = await client.mutation(operation, opts)
   if (error) {
     return [null, error]
   }
 
-  if (opts?.appendToCache) {
-    const [_, operationName] = parseGQLString(operation)
-    let cachedData
-    cache?.subscribe(v => {
-      cachedData = v
-    })
-
-    if (data?.[operationName].constructor === Array) {
-      cache?.set(
-        opts.appendToCache,
-        [].concat(cachedData?.[opts.appendToCache], data?.[operationName]),
-      )
-      return [data, null]
-    }
-
-    // TODO: Test that the data?.[operationName] is being concatenated properly
-    cache?.set(
-      opts.appendToCache,
-      [].concat(cachedData?.[opts.appendToCache], data?.[operationName]),
-    )
-    return [data, null]
-  }
+  cache?.set(mapToObject(CACHE))
 
   return [data, null]
 }
