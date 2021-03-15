@@ -34,6 +34,7 @@
 
 <script>
   import Nav from "../components/Nav.svelte"
+  import SuccessToast from "../components/lib/Toast_Success.svelte"
   import ErrorToast from "../components/lib/Toast_Error.svelte"
   import { ErrorStore } from "../stores/store_Errors.js"
 
@@ -51,6 +52,7 @@
   <slot />
 </main>
 
+<SuccessToast />
 <ErrorToast />
 
 <style>

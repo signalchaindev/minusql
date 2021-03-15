@@ -7,9 +7,11 @@
 </script>
 
 <script>
+  import { goto } from "@sapper/app"
   import { onMount } from "svelte"
   import { gql } from "minusql"
   import { useQuery, useMutation } from "svelte-minusql"
+  import { SuccessStore } from "../../stores/store_Success.js"
   import { ErrorStore } from "../../stores/store_Errors.js"
   import { GET_ALL_TODOS_QUERY, GET_TODO_BY_ID } from "../../graphql/query.js"
 
@@ -68,6 +70,32 @@
     }
   }
 
+  const DELETE_TODO_MUTATION = gql`
+    mutation DELETE_TODO_MUTATION($id: String!) {
+      deleteTodo(id: $id)
+    }
+  `
+
+  async function deleteTodo(id) {
+    const [data, error] = await useMutation(DELETE_TODO_MUTATION, {
+      variables: {
+        id,
+      },
+      deleteCacheKey: [
+        {
+          query: GET_TODO_BY_ID,
+          variables: { id: todo._id },
+        },
+      ],
+      refetchQuery: [{ query: GET_ALL_TODOS_QUERY }],
+    })
+    if (error) {
+      console.error(error)
+    }
+    SuccessStore.set({ alert: data.deleteTodo })
+    goto("/")
+  }
+
   function handleKeyPress(e) {
     if (editMode === true && e.key === "Enter") {
       updateTodo()
@@ -121,7 +149,38 @@
           Notes:
           <input type="text" bind:value={todo.notes} />
         </p>
-        <button class="save-btn" on:click={updateTodo}>Save</button>
+
+        <div class="ct-action-buttons">
+          <button class="save-btn" on:click={updateTodo}>Save</button>
+
+          <button
+            on:click={() => deleteTodo(todo._id)}
+            class="primary delete-button"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="ionicon"
+              viewBox="0 0 512 512"
+            >
+              <path
+                d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
+                fill="none"
+                stroke="currentColor"
+                stroke-miterlimit="10"
+                stroke-width="32"
+              />
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="32"
+                d="M320 320L192 192m0 128l128-128"
+              />
+            </svg>
+            <span>Delete</span>
+          </button>
+        </div>
       {/if}
     </div>
   {:else}
@@ -152,9 +211,33 @@
     line-height: 0;
   }
 
-  .save-btn {
-    display: block;
-    margin: 16px 0 0 auto;
+  button:hover,
+  button:focus {
+    box-shadow: 0 0 0 2px lightgreen;
+  }
+
+  .ct-action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 16px;
+  }
+
+  .delete-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 24px;
+  }
+
+  .delete-button:hover,
+  .delete-button:focus {
+    box-shadow: 0 0 0 2px red;
+  }
+
+  .delete-button svg {
+    height: 24px;
+    width: 24px;
   }
 
   .ct-details {

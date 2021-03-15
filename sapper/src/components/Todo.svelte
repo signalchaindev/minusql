@@ -2,6 +2,7 @@
   import { gql } from "minusql"
   import { useMutation } from "svelte-minusql"
   import { GET_ALL_TODOS_QUERY, GET_TODO_BY_ID } from "../graphql/query.js"
+  import { SuccessStore } from "../stores/store_Success.js"
 
   export let todo
   $: completed = todo.completed
@@ -17,7 +18,6 @@
   `
 
   async function updateTodo() {
-    console.log("GET_ALL_TODOS_QUERY:", GET_ALL_TODOS_QUERY)
     completed = !completed
     const [_, error] = await useMutation(UPDATE_TODO_MUTATION, {
       variables: {
@@ -32,7 +32,6 @@
         { query: GET_ALL_TODOS_QUERY },
       ],
     })
-
     if (error) {
       console.error(error)
     }
@@ -60,7 +59,7 @@
     if (error) {
       console.error(error)
     }
-    console.log("data:", data)
+    SuccessStore.set({ alert: data.deleteTodo })
   }
 </script>
 
@@ -76,27 +75,29 @@
   </label>
   &nbsp
   <a href={`todo/${todo._id}`} sapper:prefetch>notes</a>
-  <button on:click={() => deleteTodo(todo._id)} class="primary"
-    ><svg
+  <button on:click={() => deleteTodo(todo._id)} class="primary">
+    <svg
       xmlns="http://www.w3.org/2000/svg"
       class="ionicon"
       viewBox="0 0 512 512"
-      ><path
+    >
+      <path
         d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z"
         fill="none"
         stroke="currentColor"
         stroke-miterlimit="10"
         stroke-width="32"
-      /><path
+      />
+      <path
         fill="none"
         stroke="currentColor"
         stroke-linecap="round"
         stroke-linejoin="round"
         stroke-width="32"
         d="M320 320L192 192m0 128l128-128"
-      /></svg
-    ></button
-  >
+      />
+    </svg>
+  </button>
 </li>
 
 <style>

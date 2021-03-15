@@ -208,7 +208,7 @@ export class MinusQL {
         ...this.requestOptions,
       }
 
-      console.warn("-----------FETCH-----------")
+      // console.warn("-----------FETCH-----------")
       const r = await fetch(this.uri, requestObject)
       if (r.ok !== true) {
         console.error(`${r.status} ${r.statusText}`)
@@ -341,7 +341,7 @@ export class MinusQL {
 
       if (!isCached && data) {
         CACHE.set(key, data)
-        console.warn("\nSET CACHE:", CACHE, "\n\n")
+        // console.warn("\nSET CACHE:", CACHE, "\n\n")
         return CACHE
       }
 
@@ -355,7 +355,7 @@ export class MinusQL {
               data?.[operationName],
             ),
           })
-          console.warn("\nUPDATE_CACHE (ARRAY):", CACHE, "\n\n")
+          // console.warn("\nUPDATE_CACHE (ARRAY):", CACHE, "\n\n")
           return CACHE
         }
 
@@ -363,7 +363,7 @@ export class MinusQL {
           [`${appendToCache}`]: [].concat(cached?.[key], data?.[operationName]),
         })
 
-        console.warn("\nUPDATE_CACHE:", CACHE, "\n\n")
+        // console.warn("\nUPDATE_CACHE:", CACHE, "\n\n")
         return CACHE
       }
     } catch (err) {
