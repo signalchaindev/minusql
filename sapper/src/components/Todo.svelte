@@ -1,6 +1,6 @@
 <script>
   import { gql } from "minusql"
-  import { cache, useMutation } from "svelte-minusql"
+  import { useMutation } from "svelte-minusql"
 
   export let todo
   $: completed = todo.completed
@@ -16,6 +16,7 @@
   `
 
   async function updateTodo() {
+    completed = !completed
     const [_, error] = await useMutation(UPDATE_TODO_MUTATION, {
       variables: {
         todo: {
@@ -24,7 +25,6 @@
           completed,
         },
       },
-      updateQuery: "getAllTodos",
     })
 
     if (error) {

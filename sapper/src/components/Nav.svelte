@@ -1,7 +1,26 @@
 <script>
-  import { cache } from "svelte-minusql"
+  import { onMount } from "svelte"
+  import { gql } from "minusql"
+  import { useQuery } from "svelte-minusql"
+  import { ErrorStore } from "../stores/store_Errors.js"
 
   export let nav
+
+  let data
+
+  const TEST_CONNECTION_QUERY = gql`
+    query TEST_CONNECTION_QUERY {
+      testConnection
+    }
+  `
+
+  onMount(async () => {
+    const [d, err] = await useQuery(TEST_CONNECTION_QUERY)
+    if (err) {
+      ErrorStore.set(err)
+    }
+    data = d
+  })
 </script>
 
 <header>
@@ -17,7 +36,7 @@
     </ul>
   </nav>
 
-  <p>{$cache?.testConnection || "Loading..."}</p>
+  <p>{$data?.testConnection || "Loading..."}</p>
 </header>
 
 <style>

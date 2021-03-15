@@ -20,3 +20,5 @@
     console.log(data)
   })
 </script>
+
+<h1>This page is to test errors</h1>

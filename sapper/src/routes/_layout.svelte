@@ -1,7 +1,7 @@
 <script context="module">
   import { gql } from "minusql"
   import { MinusQL } from "minusql"
-  import { setClient, cache, useQuery } from "svelte-minusql"
+  import { setClient } from "svelte-minusql"
 
   const endpoint = `${process.env.GQL_SERVER_ENDPOINT_BASE}/${process.env.GQL_SERVER_PATH}`
   const client = new MinusQL({ uri: endpoint })
@@ -17,7 +17,7 @@
   `
 
   export async function preload() {
-    const [data, error] = await useQuery(CMS_QUERY)
+    const [data, error] = await client.query(CMS_QUERY)
     if (error) {
       return {
         nav: data?.nav || null,
@@ -33,12 +33,9 @@
 </script>
 
 <script>
-  import { onMount } from "svelte"
   import Nav from "../components/Nav.svelte"
   import ErrorToast from "../components/lib/Toast_Error.svelte"
   import { ErrorStore } from "../stores/store_Errors.js"
-
-  $: console.log("cache:", $cache)
 
   export let nav
   export let error
@@ -46,19 +43,6 @@
   if (error) {
     ErrorStore.set(error)
   }
-
-  const TEST_CONNECTION_QUERY = gql`
-    query TEST_CONNECTION_QUERY {
-      testConnection
-    }
-  `
-
-  onMount(async () => {
-    const [_, err] = await useQuery(TEST_CONNECTION_QUERY)
-    if (err) {
-      ErrorStore.set(err)
-    }
-  })
 </script>
 
 <Nav {nav} />

@@ -9,14 +9,15 @@
 <script>
   import { onMount } from "svelte"
   import { gql } from "minusql"
-  import { cache, useQuery, useMutation } from "svelte-minusql"
+  import { useQuery, useMutation } from "svelte-minusql"
   import { ErrorStore } from "../../stores/store_Errors.js"
 
   export let todoId
 
+  let data
   let loading = true
   let editMode = false
-  $: todo = $cache?.getTodoById
+  $: todo = $data?.getTodoById
 
   const GET_TODO_BY_ID = gql`
     query GET_TODO_BY_ID($id: String!) {
@@ -30,12 +31,13 @@
   `
 
   onMount(async () => {
-    const [_, error] = await useQuery(GET_TODO_BY_ID, {
+    const [d, error] = await useQuery(GET_TODO_BY_ID, {
       variables: { id: todoId },
     })
     if (error) {
       ErrorStore.set(error)
     }
+    data = d
 
     window.addEventListener("keydown", handleKeyPress)
     loading = false
@@ -62,16 +64,14 @@
 
     const [_, error] = await useMutation(UPDATE_TODO_MUTATION, {
       variables: {
-        id: todo.id,
         todo: {
+          id: todo.id,
           todo: todo.todo,
           completed: todo.completed,
           notes: todo.notes,
         },
       },
-      refetch: ["getAllTodos", "getTodoById"],
     })
-
     if (error) {
       console.error(error)
     }
