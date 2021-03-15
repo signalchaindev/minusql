@@ -1,5 +1,5 @@
 <script>
-  import { client, gql } from '../graphql.js'
+  import { client, gql } from "../graphql.js"
 
   export let todo
 
@@ -12,13 +12,13 @@
 
     const [updateTodo, error] = await client.mutation(UPDATE_TODO_MUTATION, {
       variables: {
-        id: todo.id,
+        id: todo._id,
         todo: {
           completed: true,
         },
       },
       refetchQuery: {
-        query: 'GET_ALL_TODOS_QUERY',
+        query: "GET_ALL_TODOS_QUERY",
       },
     })
 
@@ -26,14 +26,14 @@
       console.error(error)
     }
 
-    console.log('updateTodo:', updateTodo)
+    console.log("updateTodo:", updateTodo)
   }
 </script>
 
-<li id={todo.id}>
-  <label for="todo_{todo.id}">
+<li id={todo._id}>
+  <label for="todo_{todo._id}">
     <input
-      id="todo_{todo.id}"
+      id="todo_{todo._id}"
       on:change={updateTodo}
       type="checkbox"
       checked={todo.completed}

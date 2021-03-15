@@ -8,7 +8,7 @@
   const CREATE_TODO_MUTATION = gql`
     mutation CREATE_TODO_MUTATION($todo: String!) {
       createTodo(todo: $todo) {
-        id
+        _id
         todo
         completed
       }
@@ -16,11 +16,14 @@
   `
 
   async function createTodo() {
+    if (value === "") {
+      return
+    }
     const [_, error] = await useMutation(CREATE_TODO_MUTATION, {
       variables: {
         todo: value,
       },
-      updateQuery: "getAllTodos",
+      appendToCache: "getAllTodos",
     })
     if (error) {
       ErrorStore.set(error)

@@ -1,22 +1,12 @@
 <script>
   import { onMount } from "svelte"
-  import { gql } from "minusql"
   import Todo from "./Todo.svelte"
   import Loading from "./Loading.svelte"
   import { useQuery } from "svelte-minusql"
+  import { GET_ALL_TODOS_QUERY } from "../graphql/query.js"
 
   let data
   let loading = true
-
-  const GET_ALL_TODOS_QUERY = gql`
-    query GET_ALL_TODOS_QUERY {
-      getAllTodos {
-        id
-        todo
-        completed
-      }
-    }
-  `
 
   onMount(async () => {
     const [d, error] = await useQuery(GET_ALL_TODOS_QUERY)
@@ -31,14 +21,14 @@
 
 {#if loading}
   <Loading />
-{:else if $data?.getAllTodos}
+{:else if $data?.getAllTodos.length > 0}
   <ul>
-    {#each $data.getAllTodos as todo (todo.id)}
+    {#each $data.getAllTodos as todo (todo._id)}
       <Todo {todo} />
     {/each}
   </ul>
 {:else}
-  <p>Unable to display todos</p>
+  <p>No todos found</p>
 {/if}
 
 <style>

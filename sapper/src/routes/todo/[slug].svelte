@@ -11,6 +11,7 @@
   import { gql } from "minusql"
   import { useQuery, useMutation } from "svelte-minusql"
   import { ErrorStore } from "../../stores/store_Errors.js"
+  import { GET_ALL_TODOS_QUERY, GET_TODO_BY_ID } from "../../graphql/query.js"
 
   export let todoId
 
@@ -18,17 +19,6 @@
   let loading = true
   let editMode = false
   $: todo = $data?.getTodoById
-
-  const GET_TODO_BY_ID = gql`
-    query GET_TODO_BY_ID($id: String!) {
-      getTodoById(id: $id) {
-        id
-        todo
-        completed
-        notes
-      }
-    }
-  `
 
   onMount(async () => {
     const [d, error] = await useQuery(GET_TODO_BY_ID, {
@@ -51,7 +41,7 @@
   const UPDATE_TODO_MUTATION = gql`
     mutation UPDATE_TODO_MUTATION($todo: TodoInput!) {
       updateTodo(todo: $todo) {
-        id
+        _id
         todo
         completed
         notes
@@ -65,12 +55,13 @@
     const [_, error] = await useMutation(UPDATE_TODO_MUTATION, {
       variables: {
         todo: {
-          id: todo.id,
+          id: todoId,
           todo: todo.todo,
           completed: todo.completed,
           notes: todo.notes,
         },
       },
+      refetchQuery: [{ query: GET_ALL_TODOS_QUERY }],
     })
     if (error) {
       console.error(error)

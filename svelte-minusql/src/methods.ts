@@ -45,7 +45,7 @@ export async function useMutation(operation, opts) {
     return [null, error]
   }
 
-  if (opts?.updateQuery) {
+  if (opts?.appendToCache) {
     const [_, operationName] = parseGQLString(operation)
     let cachedData
     cache?.subscribe(v => {
@@ -53,15 +53,15 @@ export async function useMutation(operation, opts) {
     })
 
     if (data?.[operationName].constructor === Array) {
-      cache?.set(opts.updateQuery, [
-        ...cachedData?.[opts.updateQuery],
+      cache?.set(opts.appendToCache, [
+        ...cachedData?.[opts.appendToCache],
         ...data?.[operationName],
       ])
       return [data, null]
     }
 
-    cache?.set(opts.updateQuery, [
-      ...cachedData?.[opts.updateQuery],
+    cache?.set(opts.appendToCache, [
+      ...cachedData?.[opts.appendToCache],
       data?.[operationName],
     ])
     return [data, null]
