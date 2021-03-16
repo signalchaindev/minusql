@@ -1,4 +1,4 @@
-import { gql } from "minusql"
+import { gql } from "@signalchain/minusql"
 
 export const GET_ALL_TODOS_QUERY = gql`
   query GET_ALL_TODOS_QUERY {

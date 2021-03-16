@@ -9,8 +9,8 @@
 <script>
   import { goto } from "@sapper/app"
   import { onMount } from "svelte"
-  import { gql } from "minusql"
-  import { useQuery, useMutation } from "svelte-minusql"
+  import { gql } from "@signalchain/minusql"
+  import { useQuery, useMutation } from "@signalchain/svelte-minusql"
   import { SuccessStore } from "../../stores/store_Success.js"
   import { ErrorStore } from "../../stores/store_Errors.js"
   import { GET_ALL_TODOS_QUERY, GET_TODO_BY_ID } from "../../graphql/query.js"

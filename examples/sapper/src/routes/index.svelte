@@ -1,6 +1,6 @@
 <script context="module">
-  import { gql } from "minusql"
-  import { getClient } from "svelte-minusql"
+  import { gql } from "@signalchain/minusql"
+  import { getClient } from "@signalchain/svelte-minusql"
 
   const CMS_QUERY = gql`
     query CMS_QUERY {

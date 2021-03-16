@@ -1,5 +1,5 @@
 {
-  "name": "tempo",
+  "name": "tempo-api",
   "author": "James Gleason",
   "type": "module",
   "scripts": {
@@ -13,7 +13,6 @@
     "node": ">=14.3.0"
   },
   "dependencies": {
-    "@signalchain/mongoose": "^5.11.13",
     "dotenv": "8.2.0",
     "fastify": "3.12.0",
     "fastify-compress": "3.4.1",
@@ -24,15 +23,19 @@
     "jsonwebtoken": "8.5.1",
     "kleur": "4.1.4",
     "mercurius": "7.1.0",
+    "mongoose": "file:./patches/mongoose",
     "node-fetch": "2.6.1"
   },
   "devDependencies": {
     "@signalchain/tempo": "0.1.16",
+    "@types/jsonwebtoken": "8.5.1",
+    "@types/mocha": "8.2.1",
     "@types/mongoose": "5.10.3",
     "@types/node": "14.14.31",
     "@types/node-fetch": "2.5.8",
     "@typescript-eslint/eslint-plugin": "4.15.2",
     "@typescript-eslint/parser": "4.15.2",
+    "chai": "4.3.4",
     "chokidar": "3.5.1",
     "cross-env": "7.0.3",
     "esbuild": "0.8.52",
@@ -46,7 +49,8 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "3.3.1",
     "eslint-plugin-standard": "5.0.0",
-    "esm": "^3.2.25",
+    "esm": "3.2.25",
+    "mocha": "7.2.0",
     "prettier": "2.2.1",
     "random-words": "1.1.1",
     "ts-node": "9.1.1",

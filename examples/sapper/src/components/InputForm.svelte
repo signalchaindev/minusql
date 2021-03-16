@@ -1,6 +1,6 @@
 <script>
-  import { gql } from "minusql"
-  import { useMutation } from "svelte-minusql"
+  import { gql } from "@signalchain/minusql"
+  import { useMutation } from "@signalchain/svelte-minusql"
   import { ErrorStore } from "../stores/store_Errors.js"
 
   let value = ""

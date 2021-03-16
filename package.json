@@ -6,7 +6,7 @@
     "url": "git@scdgh:signalchaindev/minusql.git"
   },
   "scripts": {
-    "dev": "run-p api sapper minusql svelte-minusql",
+    "dev": "run-p api sapper minusql",
     "minusql": "pushd minusql && npm run dev",
     "svelte-minusql": "pushd svelte-minusql && npm run dev",
     "api": "pushd examples\\api && npm run dev",

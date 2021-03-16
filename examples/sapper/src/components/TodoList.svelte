@@ -2,7 +2,7 @@
   import { onMount } from "svelte"
   import Todo from "./Todo.svelte"
   import Loading from "./Loading.svelte"
-  import { useQuery } from "svelte-minusql"
+  import { useQuery } from "@signalchain/svelte-minusql"
   import { GET_ALL_TODOS_QUERY } from "../graphql/query.js"
 
   let data

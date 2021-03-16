@@ -1,6 +1,6 @@
 <script>
-  import { gql } from "minusql"
-  import { useMutation } from "svelte-minusql"
+  import { gql } from "@signalchain/minusql"
+  import { useMutation } from "@signalchain/svelte-minusql"
   import { GET_ALL_TODOS_QUERY, GET_TODO_BY_ID } from "../graphql/query.js"
   import { SuccessStore } from "../stores/store_Success.js"
 

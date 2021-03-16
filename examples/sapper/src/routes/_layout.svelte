@@ -1,7 +1,7 @@
 <script context="module">
-  import { gql } from "minusql"
-  import { MinusQL } from "minusql"
-  import { setClient } from "svelte-minusql"
+  import { gql } from "@signalchain/minusql"
+  import { MinusQL } from "@signalchain/minusql"
+  import { setClient } from "@signalchain/svelte-minusql"
 
   const endpoint = `${process.env.GQL_SERVER_ENDPOINT_BASE}/${process.env.GQL_SERVER_PATH}`
   const client = new MinusQL({ uri: endpoint })

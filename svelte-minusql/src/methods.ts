@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { writable } from "svelte/store"
-import { getCache } from "minusql"
+import { getCache } from "@signalchain/minusql"
 import { getClient } from "./context" // .ts
 import { mapToObject } from "./utils" // .ts
 
