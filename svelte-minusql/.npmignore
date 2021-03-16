@@ -3,4 +3,5 @@ node_modules/
 .github
 .vscode
 .eslintignore
+.prettierignore
 CONTRIBUTING.md

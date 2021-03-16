@@ -1,6 +1,6 @@
 {
   "name": "@signalchain/svelte-minusql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "jameygleason",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -56,7 +56,7 @@
     "typescript": "4.2.3"
   },
   "peerDependencies": {
-    "minusql": "^0.1.0",
+    "@signalchain/minusql": "^0.1.0",
     "svelte": "^3.0.0"
   }
 }
