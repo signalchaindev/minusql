@@ -1,6 +1,6 @@
 {
-  "name": "svelte-minusql",
-  "version": "1.0.0",
+  "name": "@signalchain/svelte-minusql",
+  "version": "0.1.0",
   "author": "jameygleason",
   "license": "MIT",
   "main": "./dist/index.js",
