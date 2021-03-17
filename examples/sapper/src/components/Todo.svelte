@@ -2,6 +2,7 @@
   import { gql } from "@signalchain/minusql"
   import { useMutation } from "@signalchain/svelte-minusql"
   import { GET_ALL_TODOS_QUERY, GET_TODO_BY_ID } from "../graphql/query.js"
+  import { ErrorStore } from "../stores/store_Errors.js"
   import { SuccessStore } from "../stores/store_Success.js"
 
   export let todo
@@ -33,7 +34,7 @@
       ],
     })
     if (error) {
-      console.error(error)
+      ErrorStore.set(error)
     }
   }
 
@@ -57,7 +58,7 @@
       refetchQuery: [{ query: GET_ALL_TODOS_QUERY }],
     })
     if (error) {
-      console.error(error)
+      ErrorStore.set(error)
     }
     SuccessStore.set({ alert: data.deleteTodo })
   }

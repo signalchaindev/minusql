@@ -107,24 +107,17 @@
   {#if loading}
     <p>Loading...</p>
   {:else if todo}
-    <div class="ct-heading">
-      {#if !editMode}
+    {#if !editMode}
+      <div class="ct-heading">
         <h1>
           {todo.todo}
         </h1>
-      {:else}
-        <h1>
-          <input type="text" bind:value={todo.todo} />
-        </h1>
-      {/if}
+        <button class="edit-btn" on:click={() => (editMode = !editMode)}>
+          edit
+        </button>
+      </div>
 
-      <button class="edit-btn" on:click={() => (editMode = !editMode)}>
-        edit
-      </button>
-    </div>
-
-    <div class="ct-details">
-      {#if !editMode}
+      <div class="ct-details">
         <p>
           Completed:
           <span
@@ -135,16 +128,23 @@
             {todo.completed}
           </span>
         </p>
-      {:else}
+
+        <p>Notes: {todo.notes}</p>
+      </div>
+    {:else}
+      <div class="ct-heading">
+        <h1 class="hide">
+          {todo.todo}
+        </h1>
+        <input type="text" bind:value={todo.todo} />
+      </div>
+
+      <div class="ct-details">
         <p>
           Completed:
           <input type="checkbox" bind:checked={todo.completed} />
         </p>
-      {/if}
 
-      {#if !editMode}
-        <p>Notes: {todo.notes}</p>
-      {:else}
         <p>
           Notes:
           <input type="text" bind:value={todo.notes} />
@@ -181,17 +181,24 @@
             <span>Delete</span>
           </button>
         </div>
-      {/if}
-    </div>
+      </div>
+    {/if}
   {:else}
     <h1>Not found</h1>
   {/if}
 </section>
 
 <style>
+  section {
+    max-width: 500px;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
   .ct-heading {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
   }
 
