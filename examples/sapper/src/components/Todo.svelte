@@ -64,7 +64,7 @@
 </script>
 
 <li id={todo._id}>
-  <label for="todo_{todo._id}">
+  <label for="todo_{todo._id}" class="checkbox-label">
     <input
       on:change={updateTodo}
       id="todo_{todo._id}"
@@ -110,18 +110,6 @@
 
   li:last-of-type {
     margin-bottom: 0px;
-  }
-
-  label {
-    display: block;
-  }
-
-  input {
-    margin: 0px;
-  }
-
-  span {
-    margin-left: 8px;
   }
 
   a {

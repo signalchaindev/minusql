@@ -2,8 +2,22 @@
   import { gql } from "@signalchain/minusql"
   import { useMutation } from "@signalchain/svelte-minusql"
   import { ErrorStore } from "../stores/store_Errors.js"
+  import {
+    createForm,
+    Form,
+    Fieldset,
+    Legend,
+    Field,
+  } from "@signalchain/svelte-forms"
 
-  let value = ""
+  const context = createForm({
+    initialValues: {
+      addTodo: "",
+    },
+    onSubmit,
+  })
+
+  const { errors, isSubmitting, handleSubmit } = context
 
   const CREATE_TODO_MUTATION = gql`
     mutation CREATE_TODO_MUTATION($todo: String!) {
@@ -15,64 +29,62 @@
     }
   `
 
-  async function createTodo() {
+  async function onSubmit(value) {
+    console.log("value:", value)
     if (value === "") {
       return
     }
     const [_, error] = await useMutation(CREATE_TODO_MUTATION, {
       variables: {
-        todo: value,
+        todo: value.addTodo,
       },
       appendToCache: "getAllTodos",
     })
     if (error) {
       ErrorStore.set(error)
-      return
+      $errors = $ErrorStore // eslint-disable-line
     }
-
-    value = ""
   }
 </script>
 
-<form on:submit|preventDefault={createTodo}>
-  <label for="todo-input">
-    <span>Add Todo:</span>
-    <input
-      id="todo-input"
-      type="text"
-      on:keyup={e => (value = e.target.value)}
-      {value}
-    />
-  </label>
-  <button type="submit">+</button>
-</form>
+<div>
+  <Form on:submit={handleSubmit} class="basic-form" {context}>
+    <Fieldset disabled={$isSubmitting}>
+      <Legend>Add Todo:</Legend>
+
+      <div class="ct-input">
+        <Field name="add todo" class="hide_label" />
+
+        <button class="primary" type="submit">
+          {#if $isSubmitting}
+            loading...
+          {:else}
+            +
+          {/if}
+        </button>
+      </div>
+    </Fieldset>
+  </Form>
+</div>
 
 <style>
-  form {
-    max-width: 500px;
+  div :global(form) {
+    max-width: 400px;
     margin: 24px auto;
+  }
+
+  .ct-input {
     display: flex;
   }
 
-  label {
-    display: block;
-  }
-
-  label > span {
-    font-size: 24px;
-    font-weight: bold;
-  }
-
-  label > input {
-    display: block;
-    margin: 8px auto 0;
-    max-width: 100%;
+  .ct-input :global(label) {
+    flex-grow: 1;
   }
 
   button {
     font-size: 24px;
     font-weight: bolder;
     height: 36px;
-    align-self: flex-end;
+    width: 24px;
   }
 </style>

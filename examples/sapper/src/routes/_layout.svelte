@@ -1,6 +1,5 @@
 <script context="module">
-  import { gql } from "@signalchain/minusql"
-  import { MinusQL } from "@signalchain/minusql"
+  import { MinusQL, gql } from "@signalchain/minusql"
   import { setClient } from "@signalchain/svelte-minusql"
 
   const endpoint = `${process.env.GQL_SERVER_ENDPOINT_BASE}/${process.env.GQL_SERVER_PATH}`
@@ -54,12 +53,3 @@
 
 <SuccessToast />
 <ErrorToast />
-
-<style>
-  main {
-    color: #000031;
-    font-family: sans-serif;
-    margin: 0 auto;
-    max-width: max-content;
-  }
-</style>

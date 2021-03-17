@@ -1,21 +1,21 @@
 /* eslint-disable import/no-commonjs */
 /** @type {import('eslint').Linter.Config} */
-const fs = require("fs")
-const path = require("path")
+// const fs = require("fs")
+// const path = require("path")
 
-const schemaPath = path.join(
-  process.cwd(),
-  "api",
-  "src",
-  "node_modules",
-  "@tempo",
-  "typeDefs.js",
-)
+// const schemaPath = path.join(
+//   process.cwd(),
+//   "api",
+//   "src",
+//   "node_modules",
+//   "@tempo",
+//   "typeDefs.js",
+// )
 
-const schemaString = fs
-  .readFileSync(schemaPath, "utf-8")
-  .replace("export const typeDefs = `", "")
-  .replace("`", "")
+// const schemaString = fs
+//   .readFileSync(schemaPath, "utf-8")
+//   .replace("export const typeDefs = `", "")
+//   .replace("`", "")
 
 module.exports = {
   root: true,
@@ -24,7 +24,7 @@ module.exports = {
     browser: true,
     node: true,
   },
-  parser: "@typescript-eslint/parser",
+  parser: "babel-eslint",
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: "module",
@@ -38,14 +38,7 @@ module.exports = {
     caches: true,
     fetch: true,
   },
-  plugins: [
-    "@typescript-eslint",
-    "svelte3",
-    "node",
-    "import",
-    "json",
-    "graphql",
-  ],
+  plugins: ["svelte3", "node", "import", "json", "graphql"],
   overrides: [
     {
       files: ["**/*.svelte"],
@@ -68,28 +61,19 @@ module.exports = {
         map: [["@sapper", "./src/node_modules/@sapper"]],
         extensions: [".js", ".ts", ".svelte"],
       },
-      typescript: {}, // this loads <root_dir>/tsconfig.json to eslint
     },
   },
   rules: {
-    // ENV Specific
-    "@typescript-eslint/no-extra-semi": 0,
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        argsIgnorePattern: "^_|req|res|next|args|ctx|__",
-        varsIgnorePattern: "^_|req|res|next|args|ctx|__",
-      },
-    ],
-    "graphql/template-strings": [
-      "error",
-      {
-        env: "literal",
-        tagName: "gql",
-        schemaString,
-      },
-    ],
-    // END
+    // // ENV Specific
+    // "graphql/template-strings": [
+    //   "error",
+    //   {
+    //     env: "literal",
+    //     tagName: "gql",
+    //     schemaString,
+    //   },
+    // ],
+    // // END
 
     camelcase: 0,
     "comma-dangle": ["error", "always-multiline"],
