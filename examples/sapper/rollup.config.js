@@ -6,25 +6,24 @@ import replace from "@rollup/plugin-replace"
 import commonjs from "@rollup/plugin-commonjs"
 import url from "@rollup/plugin-url"
 import svelte from "rollup-plugin-svelte"
-import babel from "@rollup/plugin-babel"
 import { terser } from "rollup-plugin-terser"
-import sveltePreprocess from "svelte-preprocess"
 import typescript from "@rollup/plugin-typescript"
+import sveltePreprocess from "svelte-preprocess"
+import postcssPresetEnv from "postcss-preset-env"
+import postcsseasings from "postcss-easings"
+import purgecss from "@fullhuman/postcss-purgecss"
+import cssnano from "cssnano"
 import config from "sapper/config/rollup.js"
 import sapperenv from "./.env.js"
 
 const pkg = JSON.parse(
   fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"),
 )
-if (Object.keys(pkg).length < 1) {
-  console.error("Failed to parse package.json")
-}
+if (Object.keys(pkg).length < 1) console.error("Failed to parse package.json")
 
 const mode = process.env.NODE_ENV
 const dev = mode === "development"
-const legacy = !!process.env.SAPPER_LEGACY_BUILD
 
-// Create an object of the values from .env.js based on current environment
 const ENV_VARS = {}
 const modes = Object.keys(sapperenv)
 const idx = modes.indexOf(mode)
@@ -35,6 +34,50 @@ for (const [key, val] of Object.entries(envVars)) {
   ENV_VARS[`process.env.${key}`] = JSON.stringify(val)
 }
 
+/**
+ * autoprefixer browserslist is in the package.json
+ *
+ * postcss-preset-env enables Stage 2 by default
+ * https://preset-env.cssdb.org/features
+ * https://www.npmjs.com/package/postcss-preset-env
+ *
+ * We are using the older syntax for :is()
+ * Until :is() has better support, use :matches()
+ *
+ */
+const postcssProdPlugins = !dev
+  ? [
+      purgecss({
+        content: ["./src/**/*.svelte"],
+      }),
+      cssnano({
+        preset: "default",
+      }),
+    ]
+  : []
+
+const preprocess = sveltePreprocess({
+  scss: {
+    includePaths: ["src"],
+    sourceMap: dev,
+  },
+  postcss: {
+    plugins: [
+      postcsseasings(),
+      postcssPresetEnv({
+        autoprefixer: !dev,
+        stage: 0,
+        features: {
+          "logical-properties-and-values": false,
+          "prefers-color-scheme-query": false,
+          "gap-properties": false,
+        },
+      }),
+      ...postcssProdPlugins,
+    ],
+  },
+})
+
 const onwarn = (warning, onwarn) =>
   (warning.code === "MISSING_EXPORT" && /'preload'/.test(warning.message)) ||
   (warning.code === "CIRCULAR_DEPENDENCY" &&
@@ -42,121 +85,102 @@ const onwarn = (warning, onwarn) =>
   warning.code === "THIS_IS_UNDEFINED" ||
   onwarn(warning)
 
-export default {
-  client: {
-    input: config.client.input().replace(/\.js$/, ".ts"),
-    output: config.client.output(),
-    plugins: [
-      replace({
-        "process.browser": true,
-        ...ENV_VARS,
-        preventAssignment: true, // Should default to "true" in v3
-      }),
-      svelte({
-        preprocess: sveltePreprocess(),
-        compilerOptions: {
-          dev,
-          hydratable: true,
-        },
-      }),
-      url({
-        sourceDir: path.resolve(__dirname, "src/node_modules/images"),
-        publicPath: "/client/",
-      }),
-      resolve({
-        browser: true,
-        dedupe: ["svelte"],
-      }),
-      commonjs(),
-      typescript({ sourceMap: dev }),
+const client = {
+  input: config.client.input().replace(/\.js$/, ".ts"),
+  output: config.client.output(),
+  plugins: [
+    replace({
+      "process.browser": true,
+      ...ENV_VARS,
+      preventAssignment: true, // Should default to "true" in v3
+    }),
+    svelte({
+      preprocess,
+      compilerOptions: {
+        dev,
+        hydratable: true,
+      },
+    }),
+    url({
+      sourceDir: path.resolve(__dirname, "src/node_modules/images"),
+      publicPath: "/client/",
+    }),
+    resolve({
+      browser: true,
+      dedupe: ["svelte"],
+    }),
+    commonjs(),
+    typescript({ sourceMap: dev }),
 
-      legacy &&
-        babel({
-          extensions: [".js", ".mjs", ".html", ".svelte"],
-          babelHelpers: "runtime",
-          exclude: ["node_modules/@babel/**"],
-          presets: [
-            [
-              "@babel/preset-env",
-              {
-                targets: "> 0.25%, not dead",
-              },
-            ],
-          ],
-          plugins: [
-            "@babel/plugin-syntax-dynamic-import",
-            [
-              "@babel/plugin-transform-runtime",
-              {
-                useESModules: true,
-              },
-            ],
-          ],
-        }),
-
-      !dev &&
-        terser({
-          module: true,
-        }),
-    ],
-
-    preserveEntrySignatures: false,
-    onwarn,
-  },
-
-  server: {
-    input: { server: config.server.input().server.replace(/\.js$/, ".ts") },
-    output: config.server.output(),
-    plugins: [
-      replace({
-        "process.browser": false,
-        ...ENV_VARS,
-        preventAssignment: true, // Should default to "true" in v3
+    !dev &&
+      terser({
+        module: true,
       }),
-      svelte({
-        preprocess: sveltePreprocess(),
-        compilerOptions: {
-          dev,
-          generate: "ssr",
-          hydratable: true,
-        },
-        emitCss: false,
-      }),
-      url({
-        sourceDir: path.resolve(__dirname, "src/node_modules/images"),
-        publicPath: "/client/",
-        emitFiles: false, // already emitted by client build
-      }),
-      resolve({
-        dedupe: ["svelte"],
-      }),
-      commonjs(),
-      typescript({ sourceMap: dev }),
-    ],
-    external: [].concat(
-      Object.keys(pkg.dependencies || {}),
-      module.builtinModules,
-    ),
+  ],
 
-    preserveEntrySignatures: "strict",
-    onwarn,
-  },
-
-  // serviceworker: {
-  //   input: config.serviceworker.input().replace(/\.js$/, ".ts"),
-  //   output: config.serviceworker.output(),
-  //   plugins: [
-  //     resolve(),
-  //     replace({
-  //       "process.browser": true,
-  //       "process.env.NODE_ENV": JSON.stringify(mode),
-  //     }),
-  //     commonjs(),
-  //     typescript({ sourceMap: dev }),
-  //     !dev && terser(),
-  //   ],
-
-  //   preserveEntrySignatures: false,
-  //   onwarn,
-  // },
+  preserveEntrySignatures: false,
+  onwarn,
 }
+
+const server = {
+  input: { server: config.server.input().server.replace(/\.js$/, ".ts") },
+  output: config.server.output(),
+  plugins: [
+    replace({
+      "process.browser": false,
+      ...ENV_VARS,
+      preventAssignment: true, // Should default to "true" in v3
+    }),
+    svelte({
+      preprocess,
+      emitCss: false,
+      compilerOptions: {
+        dev,
+        generate: "ssr",
+        hydratable: true,
+      },
+    }),
+    url({
+      sourceDir: path.resolve(__dirname, "src/node_modules/images"),
+      publicPath: "/client/",
+      emitFiles: false,
+    }),
+    resolve({
+      dedupe: ["svelte"],
+    }),
+    commonjs(),
+    typescript({ sourceMap: dev }),
+  ],
+  external: [].concat(
+    Object.keys(pkg.dependencies || {}),
+    module.builtinModules,
+  ),
+
+  preserveEntrySignatures: "strict",
+  onwarn,
+}
+
+// const serviceworker = {
+//   input: config.serviceworker.input().replace(/\.js$/, ".ts"),
+//   output: config.serviceworker.output(),
+//   plugins: [
+//     resolve(),
+//     replace({
+//       'process.browser': true,
+//       ...ENV_VARS,
+//     }),
+//     commonjs(),
+//     typescript({ sourceMap: dev }),
+//     !dev && terser(),
+//   ],
+//   preserveEntrySignatures: false,
+//   onwarn,
+// }
+
+const configuration = {
+  client,
+  server,
+  // serviceworker,
+}
+
+export default configuration
