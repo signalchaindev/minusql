@@ -8,11 +8,12 @@ module.exports = {
     browser: true,
     node: true,
   },
-  parser: "babel-eslint",
+  parser: "@babel/eslint-parser",
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: "module",
     allowImportExportEverywhere: true, // dynamic import
+    requireConfigFile: false,
   },
   extends: ["standard", "eslint:recommended"],
   globals: {

@@ -46,7 +46,6 @@
     "eslint-plugin-mocha": "8.1.0",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "3.3.1",
-    "eslint-plugin-standard": "5.0.0",
     "kleur": "4.1.4",
     "@signalchain/minusql": "file:../minusql",
     "rollup-plugin-dts": "3.0.1",
