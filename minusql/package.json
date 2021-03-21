@@ -1,6 +1,6 @@
 {
   "name": "@signalchain/minusql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Todo <todo@example.com> (https://example.com/)",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -21,8 +21,7 @@
     "url": "https://github.com/username/minusql"
   },
   "files": [
-    "index.js",
-    "index.es.js",
+    "dist",
     "utils",
     "package.json",
     "LICENSE",
